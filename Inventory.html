@@ -1,0 +1,257 @@
+  
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INVENTORY</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='inventory.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        .search-container {
+            transition: margin 0.3s ease;
+        }
+
+         /* SHIFT CLASSES */
+        .shifted-left { margin-left: 200px; }
+        .shifted-right { margin-right: 25%; } /* matches order panel width */
+        .shifted-left-time, .shifted-right-time { transition: margin 0.3s ease; }
+
+        /* PRODUCT DISPLAY */
+        .product-display {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 10px;
+            transition: margin 0.3s ease;
+        }
+
+        .product-display.shifted-right {
+            margin-right: 25%;
+        }
+
+        .product-card {
+            background: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+        }
+
+        .product-card:hover { transform: translateY(-5px); cursor: pointer; }
+
+        .product-card img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-name { font-weight: bold; font-size: 16px; margin-top: 8px; }
+        .product-price { color: green; font-size: 15px; margin-top: 5px; }
+       
+         .order-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+            background: #fdf2f2;
+            border: none;
+        }
+   
+   </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="sidebar">
+        <div class="p-3">
+            <h5>{{ user.personal_name }}</h5>
+            <p>{{ user.job_desc }}</p>
+        </div>
+        <ul class="list-unstyled ps-3">
+            <li>
+                <a href="{{ url_for('dashboard') }}">Point_of_sales</a>
+            </li>
+            <li>
+                <a href="{{ url_for('activity_billing_queue') }}">Activity</a>
+            </li>
+            <li>
+                <a href="{{ url_for('audit_logs') }}">Audit logs</a>
+            </li>
+            <!-- New Inventory link -->
+            <li>
+                <a href="{{ url_for('inventory_page') }}">Inventory</a>
+            </li>
+            <li><a href="#">Teams</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </div>
+
+    <!-- ORDER PANEL -->
+    <div id="orderContainer" class="order-container">
+        
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="top-bar d-flex align-items-center">
+        <div id="menuToggle" class="menu-icon">&#9776;</div>
+        <div class="date-box ms-3 top-bar-item">
+           <button class="icon-button">
+                <img src="{{ url_for('static', filename='images/calendar_icon.jpg') }}" 
+                    alt="date_icon" 
+                    class="icon-img">
+           </button>
+          <span id="dateText">--/--/----</span>
+        </div>
+
+        <div class="time-box ms-3 top-bar-item">
+            <button class="icon-button">
+                <img src="{{ url_for('static', filename='images/clock_icon.jpg') }}" 
+                    alt="date_icon" 
+                    class="icon-img">
+           </button>
+            <span id="timeText">--:--:--</span>
+        </div>
+        <div id="orderToggle" class="ms-auto open-order top-bar-item">Open Order</div>
+    </div>
+
+     <!-- BUTTON CONTAINER AS HORIZONTAL NAV -->
+     <!-- BUTTON CONTAINER AS HORIZONTAL NAV -->
+    <div id="buttonsContainer" class="buttons-container">
+       <button class="dashboard-btn">Link 1</button>
+	   <button class="dashboard-btn">Link 2</button> 
+	   <button class="dashboard-btn">Link 3</button>
+	   <button class="dashboard-btn">Link 4</button>
+	   <button class="dashboard-btn">Link 5</button>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div id="searchContainer" class="search-container mt-3">
+        <div class="input-group">
+            <input type="text" id="searchInput" placeholder="Search for something sweet on your mind" class="form-control">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+        </div>
+    </div>
+    
+        <!-- BIG DISPLAY SCREEN -->
+    <div id="bigDisplay" class="big-display">
+        <!-- content goes here -->
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+    // DATE & TIME
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('dateText').textContent = now.toLocaleDateString();
+            document.getElementById('timeText').textContent = now.toLocaleTimeString();
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        // ELEMENTS
+        const orderToggle = document.getElementById('orderToggle');
+        const sidebar = document.getElementById('sidebar');
+        const orderContainer = document.getElementById('orderContainer');
+        const menuToggle = document.getElementById('menuToggle');
+        const buttonsContainer = document.getElementById('buttonsContainer');
+        const searchContainer = document.getElementById('searchContainer');
+        const productDisplay = document.querySelector('.product-display');
+        const buttons = document.querySelectorAll('.dashboard-btn');
+        const topBarItems = document.querySelectorAll('.top-bar-item');
+        let tempOrderItems = [];
+
+        // SHIFT FUNCTION
+        function shiftUI(shiftSidebar, shiftOrder) {
+            if (shiftSidebar) {
+                buttonsContainer.classList.add('shifted-left');
+                searchContainer.classList.add('shifted-left');
+                topBarItems.forEach(el => el.classList.add('shifted-left-time'));
+            } else {
+                buttonsContainer.classList.remove('shifted-left');
+                searchContainer.classList.remove('shifted-left');
+                topBarItems.forEach(el => el.classList.remove('shifted-left-time'));
+            }
+
+            if (shiftOrder) {
+                buttonsContainer.classList.add('shifted-right');
+                searchContainer.classList.add('shifted-right');
+                productDisplay.classList.add('shifted-right');
+                topBarItems.forEach(el => el.classList.add('shifted-right-time'));
+            } else {
+                buttonsContainer.classList.remove('shifted-right');
+                searchContainer.classList.remove('shifted-right');
+                productDisplay.classList.remove('shifted-right');
+                topBarItems.forEach(el => el.classList.remove('shifted-right-time'));
+            }
+
+            if (shiftSidebar || shiftOrder) {
+                buttons.forEach(btn => btn.style.flex = '0 1 auto');
+            } else {
+                buttons.forEach(btn => btn.style.flex = '1');
+            }
+        }
+
+        // SIDEBAR TOGGLE
+        menuToggle.addEventListener('click', function() {
+            orderContainer.classList.remove("active"); 
+            orderToggle.textContent = "Open Order";
+            orderToggle.classList.remove("close-order");
+            orderToggle.classList.add("open-order");
+
+            sidebar.classList.toggle('active');
+            shiftUI(sidebar.classList.contains('active'), false);
+        });
+    
+        // ORDER TOGGLE
+        orderToggle.addEventListener('click', () => {
+            if (orderToggle.textContent === "Open Order") {
+                orderContainer.classList.add("active");
+                orderToggle.textContent = "Close Order";
+                orderToggle.classList.remove("open-order");
+                orderToggle.classList.add("close-order");
+
+                sidebar.classList.remove('active');
+                shiftUI(false, true);
+            } else {
+                orderContainer.classList.remove("active");
+                orderToggle.textContent = "Open Order";
+                orderToggle.classList.remove("close-order");
+                orderToggle.classList.add("open-order");
+
+                shiftUI(false, false);
+
+               
+        // ===== RESET DISPLAY SCREEN 1 =====
+        orderItems.innerHTML = "";  // clears all selected products
+
+        // ===== RESET TEMP JSON =====
+        tempOrderItems = [];
+
+        // ===== RESET SUBTOTAL =====
+        document.querySelector('.subtotal-amount').textContent = '$0.00';
+            }
+        });
+
+        // CLOSE SIDEBAR ON CLICK
+        sidebar.addEventListener('click', function () {
+            sidebar.classList.remove('active');
+            shiftUI(false, false);
+        });
+
+
+    </script>
+
+</body>
+</html>

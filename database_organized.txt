@@ -1,0 +1,1133 @@
+CREATE DATABASE bakery_busness;
+
+	Use bakery_busness;
+
+	user
+
+	 CREATE TABLE user (
+				user_id INT AUTO_INCREMENT PRIMARY KEY,
+				user_name VARCHAR(255) NOT NULL,
+				personal_name  VARCHAR(255) NOT NULL,
+				user_password DECIMAL(10,2) NOT NULL,
+				job_desc VARCHAR(255) NOT NULL
+			);
+
+	INSERT INTO user (user_name, personal_name, user_password, job_desc)
+	VALUES 
+	('john_doe', 'John Doe', '12345', 'Manager'),
+	('john_doe1', 'Jane Smith', '12345', 'Cashier'),
+	('john_doe2', 'Mike Jones', '12345', 'Chef'),
+	('john_doe3', 'Sara Lee', '12345', 'Waiter'),
+	('john_doe4', 'Alex Kim', '12345', 'Receptionist');
+
+*********************************************************************************
+ DROP TABLE products;
+ 
+products
+
+		CREATE TABLE products (
+			good_number INT AUTO_INCREMENT PRIMARY KEY,
+			good_name VARCHAR(255) NOT NULL,
+			price DECIMAL(10,2) NOT NULL,
+			image_path VARCHAR(500),
+			description TEXT
+		);
+
+		+-------------+---------------+------+-----+---------+----------------+
+		| Field       | Type          | Null | Key | Default | Extra          |
+		+-------------+---------------+------+-----+---------+----------------+
+		| good_number | int           | NO   | PRI | NULL    | auto_increment |
+		| good_name   | varchar(255)  | NO   |     | NULL    |                |
+		| price       | decimal(10,2) | NO   |     | NULL    |                |
+		| image_path  | varchar(500)  | YES  |     | NULL    |                |
+		| description | text          | YES  |     | NULL    |                |
+		+-------------+---------------+------+-----+---------+----------------+
+
+			INSERT INTO products (good_name, price, image_path, description) VALUES
+			('banana_cake', 6.00, 'static/food_menu_images/banana_cake_image.jpg',
+			 'Moist and sweet banana loaf, lightly spiced, perfect for breakfast or a snack.'),
+
+			('blackforest_cake', 6.00, 'static/food_menu_images/blackforest_cake_image.jpg',
+			 'A rich chocolate cake layered with cherries and whipped cream.'),
+
+			('cake_bread', 3.00, 'static/food_menu_images/cake_bread_pic.jpg',
+			 'A soft and slightly sweet bread, perfect for breakfast or snacks.'),
+
+			('cheese_cake', 5.00, 'static/food_menu_images/cheese_cake_image.jpg',
+			 'A rich and creamy dessert with a smooth cheese filling on a buttery crust.'),
+
+			('chiffon_cake', 6.00, 'static/food_menu_images/chiffon_cake_image.jpg',
+			 'A light and airy cake made with vegetable oil and whipped egg whites.'),
+
+			('butter_cake', 4.00, 'static/food_menu_images/butter_cake_inmage.jpg',
+			 'A soft, buttery cake with a golden crust and tender crumb.'),
+
+			('choclate_mouse', 6.00, 'static/food_menu_images/chocolate_moos_image.jpg',
+			 'A creamy, fluffy chocolate dessert with a smooth texture.'),
+
+			('choclate_cake', 6.00, 'static/food_menu_images/chocolate_cake_image.jpg',
+			 'A moist and rich chocolate cake perfect for any chocolate lover.'),
+
+			('cream_cupcake', 4.00, 'static/food_menu_images/cream_cupcake_image.jpg',
+			 'A soft cupcake topped with sweet, creamy frosting.'),
+
+			('french_bread', 3.00, 'static/food_menu_images/french_bread_pic.jpg',
+			 'A classic French bread with a crisp crust and soft, airy interior.'),
+
+			('italian_bread', 4.00, 'static/food_menu_images/italian_bread_pic.jpg',
+			 'A soft and flavorful Italian bread, perfect for sandwiches or toasting.'),
+
+			('lemon_cake', 6.00, 'static/food_menu_images/lemon_cake_image.jpg',
+			 'A zesty, moist cake with a fresh lemon flavor.'),
+
+			('poundcake', 5.00, 'static/food_menu_images/poundcake_image.jpg',
+			 'A dense, buttery cake with a rich, classic flavor.'),
+
+			('sliced_bread', 3.00, 'static/food_menu_images/sliced_bread_pic.jpg',
+			 'A soft and freshly sliced bread, perfect for sandwiches or toast.'),
+
+			('soughdough_bread', 4.00, 'static/food_menu_images/soughdough_bread_pic.jpg',
+			 'A tangy and crusty sourdough bread, perfect for sandwiches or toasting.'),
+
+			('sponge_cake', 5.00, 'static/food_menu_images/sponge_cake_image.jpg',
+			 'A light and airy sponge cake, perfect for layering or enjoying as is.'),
+
+			('strawberry_mouse', 5.00, 'static/food_menu_images/strawberry_mouse_image.jpg',
+			 'A smooth and airy dessert flavored with fresh strawberries.'),
+
+			('tiramisu_cake', 6.00, 'static/food_menu_images/tiramisu_cake_image.jpg',
+			 'An Italian-inspired cake with coffee-soaked layers and creamy mascarpone.'),
+
+			('yeast_donut', 6.00, 'static/food_menu_images/yeast_donut_image.jpg',
+			 'Generated description here'),
+
+			('jelly_doughnut', 6.00, 'static/food_menu_images/jelly_doughnut_image.jpg',
+			 'A soft doughnut filled with sweet jelly and coated with sugar.'),
+
+			('glazed_doughnut', 5.00, 'static/food_menu_images/glazed_donut_image.jpg',
+			 'A classic glazed doughnut with a sweet sugar coating, soft and fluffy.'),
+
+			('Cruller_Doughnut', 6.00, 'static/food_menu_images/cruller_donut_image.jpg',
+			 'A light, twisted doughnut with a slightly crisp exterior and soft interior, perfect for a sweet snack.'),
+
+			('Cinnamon Bun', 6.50, 'static/food_menu_images/cinnamon_bun.jpg',
+			 'A soft, fluffy bun rolled with cinnamon sugar and topped with a light glaze, baked fresh daily.'),
+
+			('Fruit Cake', 8.00, 'static/food_menu_images/fruit_cake_image.jpg',
+			 'A moist traditional fruit cake packed with dried fruits and lightly spiced for rich flavor.'),
+
+			('Waffles', 7.50, 'static/food_menu_images/waffles.jpg',
+			 'Golden, crispy waffles with a soft interior, perfect with syrup, butter, or fresh fruit.'),
+
+			('Scone', 6.00, 'static/food_menu_images/Scorn.jpg',
+			 'A classic buttery scone with a crumbly texture, ideal with tea or coffee.'),
+
+			('Gourmet Burger', 12.00, 'static/food_menu_images/gormet_burger.jpg',
+			 'A premium beef burger topped with fresh vegetables, cheese, and house-made sauce.'),
+
+			('Grilled Chicken & Cheese Sandwich', 10.50, 'static/food_menu_images/grilled_cheese_chicken_sandwitch.jpg',
+			 'Grilled chicken breast layered with melted cheese and toasted bread for a hearty meal.'),
+
+			('Salad Sandwich', 8.00, 'static/food_menu_images/salad_sandwitch.jpg',
+			 'A light and fresh sandwich filled with crisp vegetables and a creamy dressing.'),
+
+			('Pita Bread Sandwich', 9.00, 'static/food_menu_images/pita_bread_sandwitch.jpg',
+			 'Soft pita bread stuffed with seasoned fillings and fresh vegetables.'),
+
+			('Grilled Cheese Sandwich', 7.50, 'static/food_menu_images/grilled_cheese_sandwitch (2).jpg',
+			 'Classic grilled sandwich with golden toasted bread and melted cheese inside.'),
+
+			('Chef’s Choice Burger', 13.50, 'static/food_menu_images/chef_choice_burger.jpg',
+			 'A signature burger crafted by the chef with premium ingredients and bold flavors.'),
+
+			('Double Decker Cheese Sandwich', 11.00, 'static/food_menu_images/double_decker_cheese_sandwitch.jpg',
+			 'A stacked sandwich with two layers of bread, rich cheese, and savory fillings.');
+
+
+********************************************************************************************************************
+DROP TABLE product_categories;
+CREATE DATABASE bakery_busness;
+
+
+	CREATE TABLE product_categories (
+		product_category_number INT AUTO_INCREMENT PRIMARY KEY,
+		product_category_name VARCHAR(255) NOT NULL
+	);
+
+	INSERT INTO product_categories (product_category_number, product_category_name) VALUES
+	(1, 'Bread'),
+	(2, 'Cake'),
+	(3, 'Donuts'),
+	(4, 'Pastries'),
+	(5, 'Sandwich');
+
+
+
+************************************************************************************
+
+DROP TABLE products_category_table;
+
+products_category_table
+
+
+		CREATE TABLE products_category_table (
+			product_number INT NOT NULL,
+			product_category_number INT NOT NULL,
+
+			CONSTRAINT fk_pct_product
+				FOREIGN KEY (product_number)
+				REFERENCES products(good_number)
+				ON DELETE CASCADE,
+
+			CONSTRAINT fk_pct_category
+				FOREIGN KEY (product_category_number)
+				REFERENCES product_categories(product_category_number)
+				ON DELETE CASCADE
+		);
+
+		INSERT INTO products_category_table (product_number, product_category_number) VALUES
+		(1, 2),   -- banana_cake
+		(2, 2),   -- blackforest_cake
+		(3, 1),   -- cake_bread
+		(4, 2),   -- cheese_cake
+		(5, 2),   -- chiffon_cake
+		(6, 2),   -- butter_cake
+		(7, 2),   -- choclate_mouse
+		(8, 2),   -- choclate_cake
+		(9, 3),   -- cream_cupcake
+		(10, 1),  -- french_bread
+		(11, 1),  -- italian_bread
+		(12, 2),  -- lemon_cake
+		(13, 2),  -- poundcake
+		(14, 1),  -- sliced_bread
+		(15, 1),  -- soughdough_bread
+		(16, 2),  -- sponge_cake
+		(17, 2),  -- strawberry_mouse
+		(18, 2),  -- tiramisu_cake
+		(19, 3),  -- yeast_donut
+		(20, 3),  -- jelly_doughnut
+		(21, 3),  -- glazed_doughnut
+		(22, 3),  -- Cruller_Doughnut
+		(23, 3),  -- Cinnamon Bun
+		(24, 3),  -- Chocolate Doughnut
+		(25, 3),  -- Boston Cream Doughnut
+		(26, 4),  -- Scone
+		(27, 5),  -- Gourmet Burger
+		(28, 5),  -- Grilled Chicken & Cheese Sandwich
+		(29, 5),  -- Salad Sandwich
+		(30, 5),  -- Pita Bread Sandwich
+		(31, 5),  -- Grilled Cheese Sandwich
+		(32, 5),  -- Chef’s Choice Burger
+		(33, 5);  -- Double Decker Cheese Sandwich
+
+**************************************************************************************************
+tables
+
+					CREATE TABLE tables (
+							Table_db_id INT AUTO_INCREMENT PRIMARY KEY,
+							Table_number VARCHAR(50) NOT NULL UNIQUE,
+							table_capacity VARCHAR(50)
+						 );
+
+					+----------------+-------------+------+-----+---------+----------------+
+					| Field          | Type        | Null | Key | Default | Extra          |
+					+----------------+-------------+------+-----+---------+----------------+
+					| Table_db_id    | int         | NO   | PRI | NULL    | auto_increment |
+					| Table_number   | varchar(50) | NO   | UNI | NULL    |                |
+					| table_capacity | varchar(50) | YES  |     | NULL    |                |
+					+----------------+-------------+------+-----+---------+----------------+
+
+					INSERT INTO tables (Table_number, table_capacity) VALUES
+					('T-01', '2 persons'),
+					('T-02', '2 persons'),
+					('T-03', '4 persons'),
+					('T-04', '4 persons'),
+					('T-05', '6 persons'),
+					('T-06', '6 persons'),
+					('T-07', '12 persons'),
+					('T-08', '12 persons'),
+					('T-09', '2 persons'),
+					('T-10', '4 persons'),
+					('T-11', '6 persons'),
+					('T-12', '12 persons'),
+					('T-13', '2 persons'),
+					('T-14', '2 persons'),
+					('T-15', '4 persons'),
+					('T-16', '4 persons'),
+					('T-17', '6 persons'),
+					('T-18', '6 persons'),
+					('T-19', '12 persons'),
+					('T-20', '12 persons'),
+					('T-21', '2 persons'),
+					('T-22', '4 persons'),
+					('T-23', '6 persons'),
+					('T-24', '12 persons'),
+					('T-25', '2 persons'),
+					('T-26', '2 persons'),
+					('T-27', '4 persons'),
+					('T-28', '4 persons'),
+					('T-29', '6 persons'),
+					('T-30', '6 persons'),
+					('T-31', '12 persons'),
+					('T-32', '12 persons'),
+					('T-33', '2 persons'),
+					('T-34', '4 persons'),
+					('T-35', '6 persons'),
+					('T-36', '12 persons'),
+					('T-37', '2 persons'),
+					('T-38', '4 persons'),
+					('T-39', '6 persons'),
+					('T-40', '12 persons'),
+					('T-41', '2 persons'),
+					('T-42', '4 persons'),
+					('T-43', '6 persons'),
+					('T-44', '12 persons'),
+					('T-45', '2 persons'),
+					('T-46', '4 persons'),
+					('T-47', '6 persons'),
+					('T-48', '12 persons'),
+					('T-49', '2 persons'),
+					('T-50', '4 persons');
+
+
+					+-------------+--------------+----------------+
+					| Table_db_id | Table_number | table_capacity |
+					+-------------+--------------+----------------+
+					|           1 | T-01         | 2 persons      |
+					|           2 | T-02         | 2 persons      |
+					|           3 | T-03         | 4 persons      |
+					|           4 | T-04         | 4 persons      |
+					|           5 | T-05         | 6 persons      |
+					|           6 | T-06         | 6 persons      |
+					|           7 | T-07         | 12 persons     |
+					|           8 | T-08         | 12 persons     |
+					|           9 | T-09         | 2 persons      |
+					|          10 | T-10         | 4 persons      |
+					|          11 | T-11         | 6 persons      |
+					|          12 | T-12         | 12 persons     |
+					|          13 | T-13         | 2 persons      |
+					|          14 | T-14         | 2 persons      |
+					|          15 | T-15         | 4 persons      |
+					|          16 | T-16         | 4 persons      |
+					|          17 | T-17         | 6 persons      |
+					|          18 | T-18         | 6 persons      |
+					|          19 | T-19         | 12 persons     |
+					|          20 | T-20         | 12 persons     |
+					|          21 | T-21         | 2 persons      |
+					|          22 | T-22         | 4 persons      |
+					|          23 | T-23         | 6 persons      |
+					|          24 | T-24         | 12 persons     |
+					|          25 | T-25         | 2 persons      |
+					|          26 | T-26         | 2 persons      |
+					|          27 | T-27         | 4 persons      |
+					|          28 | T-28         | 4 persons      |
+					|          29 | T-29         | 6 persons      |
+					|          30 | T-30         | 6 persons      |
+					|          31 | T-31         | 12 persons     |
+					|          32 | T-32         | 12 persons     |
+					|          33 | T-33         | 2 persons      |
+					|          34 | T-34         | 4 persons      |
+					|          35 | T-35         | 6 persons      |
+					|          36 | T-36         | 12 persons     |
+					|          37 | T-37         | 2 persons      |
+					|          38 | T-38         | 4 persons      |
+					|          39 | T-39         | 6 persons      |
+					|          40 | T-40         | 12 persons     |
+					|          41 | T-41         | 2 persons      |
+					|          42 | T-42         | 4 persons      |
+					|          43 | T-43         | 6 persons      |
+					|          44 | T-44         | 12 persons     |
+					|          45 | T-45         | 2 persons      |
+					|          46 | T-46         | 4 persons      |
+					|          47 | T-47         | 6 persons      |
+					|          48 | T-48         | 12 persons     |
+					|          49 | T-49         | 2 persons      |
+					|          50 | T-50         | 4 persons      |
+					+-------------+--------------+----------------+
+
+***********************************************************************************************************
+Table_floor
+
+				CREATE TABLE table_floor (
+					t_floor_id INT AUTO_INCREMENT PRIMARY KEY,
+					Table_db_id INT NOT NULL,
+					floor_name TEXT,
+					CONSTRAINT fk_table_floor
+						FOREIGN KEY (Table_db_id) REFERENCES tables(Table_db_id)
+						ON DELETE CASCADE
+						ON UPDATE CASCADE
+				);
+
+
+				+-------------+------+------+-----+---------+----------------+
+				| Field       | Type | Null | Key | Default | Extra          |
+				+-------------+------+------+-----+---------+----------------+
+				| t_floor_id  | int  | NO   | PRI | NULL    | auto_increment |
+				| Table_db_id | int  | NO   | MUL | NULL    |                |
+				| floor_name  | text | YES  |     | NULL    |                |
+				+-------------+------+------+-----+---------+----------------+
+
+
+
+				INSERT INTO table_floor (Table_db_id, floor_name) VALUES
+				(1, '3rd_floor'),
+				(2, '3rd_floor'),
+				(3, '3rd_floor'),
+				(4, '3rd_floor'),
+				(5, '3rd_floor'),
+				(6, '3rd_floor'),
+				(7, '3rd_floor'),
+				(8, '3rd_floor'),
+				(9, '3rd_floor'),
+				(10, '3rd_floor'),
+				(11, '3rd_floor'),
+				(12, '3rd_floor'),
+				(13, '2nd_floor'),
+				(14, '2nd_floor'),
+				(15, '2nd_floor'),
+				(16, '2nd_floor'),
+				(17, '2nd_floor'),
+				(18, '2nd_floor'),
+				(19, '2nd_floor'),
+				(20, '2nd_floor'),
+				(21, '2nd_floor'),
+				(22, '2nd_floor'),
+				(23, '2nd_floor'),
+				(24, '2nd_floor'),
+				(25, '1st_floor'),
+				(26, '1st_floor'),
+				(27, '1st_floor'),
+				(28, '1st_floor'),
+				(29, '1st_floor'),
+				(30, '1st_floor'),
+				(31, '1st_floor'),
+				(32, '1st_floor'),
+				(33, '1st_floor'),
+				(34, '1st_floor'),
+				(35, '1st_floor'),
+				(36, '1st_floor'),
+				(37, '3rd_floor'),
+				(38, '3rd_floor'),
+				(39, '3rd_floor'),
+				(40, '3rd_floor'),
+				(41, '2nd_floor'),
+				(42, '2nd_floor'),
+				(43, '2nd_floor'),
+				(44, '2nd_floor'),
+				(45, '1st_floor'),
+				(46, '1st_floor'),
+				(47, '1st_floor'),
+				(48, '1st_floor'),
+				(49, '3rd_floor'),
+				(50, '2nd_floor');
+
+
+
+				+------------+-------------+------------+
+				| t_floor_id | Table_db_id | floor_name |
+				+------------+-------------+------------+
+				|          1 |           1 | 3rd_floor  |
+				|          2 |           2 | 3rd_floor  |
+				|          3 |           3 | 3rd_floor  |
+				|          4 |           4 | 3rd_floor  |
+				|          5 |           5 | 3rd_floor  |
+				|          6 |           6 | 3rd_floor  |
+				|          7 |           7 | 3rd_floor  |
+				|          8 |           8 | 3rd_floor  |
+				|          9 |           9 | 3rd_floor  |
+				|         10 |          10 | 3rd_floor  |
+				|         11 |          11 | 3rd_floor  |
+				|         12 |          12 | 3rd_floor  |
+				|         13 |          13 | 2nd_floor  |
+				|         14 |          14 | 2nd_floor  |
+				|         15 |          15 | 2nd_floor  |
+				|         16 |          16 | 2nd_floor  |
+				|         17 |          17 | 2nd_floor  |
+				|         18 |          18 | 2nd_floor  |
+				|         19 |          19 | 2nd_floor  |
+				|         20 |          20 | 2nd_floor  |
+				|         21 |          21 | 2nd_floor  |
+				|         22 |          22 | 2nd_floor  |
+				|         23 |          23 | 2nd_floor  |
+				|         24 |          24 | 2nd_floor  |
+				|         25 |          25 | 1st_floor  |
+				|         26 |          26 | 1st_floor  |
+				|         27 |          27 | 1st_floor  |
+				|         28 |          28 | 1st_floor  |
+				|         29 |          29 | 1st_floor  |
+				|         30 |          30 | 1st_floor  |
+				|         31 |          31 | 1st_floor  |
+				|         32 |          32 | 1st_floor  |
+				|         33 |          33 | 1st_floor  |
+				|         34 |          34 | 1st_floor  |
+				|         35 |          35 | 1st_floor  |
+				|         36 |          36 | 1st_floor  |
+				|         37 |          37 | 3rd_floor  |
+				|         38 |          38 | 3rd_floor  |
+				|         39 |          39 | 3rd_floor  |
+				|         40 |          40 | 3rd_floor  |
+				|         41 |          41 | 2nd_floor  |
+				|         42 |          42 | 2nd_floor  |
+				|         43 |          43 | 2nd_floor  |
+				|         44 |          44 | 2nd_floor  |
+				|         45 |          45 | 1st_floor  |
+				|         46 |          46 | 1st_floor  |
+				|         47 |          47 | 1st_floor  |
+				|         48 |          48 | 1st_floor  |
+				|         49 |          49 | 3rd_floor  |
+				|         50 |          50 | 2nd_floor  |
+				+------------+-------------+------------+
+				50 rows in set (0.00 sec)
+
+******************************************************************************
+	
+
+orders_improved_table
+
+		CREATE TABLE orders_improved_table (
+			order_ID INT AUTO_INCREMENT PRIMARY KEY,
+			order_identification_number INT NOT NULL,
+			items_count INT NOT NULL,
+			order_desc TEXT,
+			user_id INT NOT NULL,
+			Total_ammount DOUBLE NOT NULL,
+			DATE DATE NOT NULL,
+			TIME TIME NOT NULL,
+			LAST_UPDATE DATETIME NOT NULL,
+
+			CONSTRAINT fk_orders_improved_user
+				FOREIGN KEY (user_id)
+				REFERENCES user(user_id)
+				ON DELETE RESTRICT
+		);
+
+
+		+-----------------------------+-------------+------+-----+---------+----------------+
+		| Field                       | Type        | Null | Key | Default | Extra          |
+		+-----------------------------+-------------+------+-----+---------+----------------+
+		| order_ID                    | int         | NO   | PRI | NULL    | auto_increment |
+		| order_identification_number | int         | NO   |     | NULL    |                |
+		| items_count                 | int         | NO   |     | NULL    |                |
+		| order_desc                  | text        | YES  |     | NULL    |                |
+		| user_id                     | int         | NO   | MUL | NULL    |                |
+		| Total_ammount               | double      | NO   |     | NULL    |                |
+		| DATE                        | date        | NO   |     | NULL    |                |
+		| TIME                        | time        | NO   |     | NULL    |                |
+		| LAST_UPDATE                 | datetime    | NO   |     | NULL    |                |
+		+-----------------------------+-------------+------+-----+---------+----------------+
+		10 rows in set (0.04 sec)
+
+*****************************************************************************
+
+order_categories
+
+		CREATE TABLE order_categories (
+			order_categories_ID INT AUTO_INCREMENT PRIMARY KEY,
+			order_categories_name VARCHAR(255) NOT NULL
+		);
+
+		INSERT INTO order_categories (order_categories_name) VALUES
+			('Dine_in'),
+			('Take_away'),
+			('Delivery');
+
+
+**************************************************************************
+
+order_with_categories
+
+		CREATE TABLE order_with_categories (
+			order_ID INT NOT NULL,
+			order_categories_ID INT NOT NULL,
+
+			FOREIGN KEY (order_ID)
+				REFERENCES orders_improved_table(order_ID)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE,
+
+			FOREIGN KEY (order_categories_ID)
+				REFERENCES order_categories(order_categories_ID)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
+		);
+
+
+****************************************************************************
+DROP TABLE IF EXISTS table_reservations;
+
+
+		-- Customer Order table
+		CREATE TABLE customer_order (
+			customer_order_id INT AUTO_INCREMENT PRIMARY KEY,
+			order_ID INT NOT NULL,
+			customer_name VARCHAR(255) NOT NULL,
+			Table_db_id INT NOT NULL,
+			FOREIGN KEY (Table_db_id) REFERENCES tables(Table_db_id) ON DELETE CASCADE,
+			FOREIGN KEY (order_ID) REFERENCES orders_improved_table(order_ID) ON DELETE CASCADE
+		);
+
+*****************************************************************************
+Order_detials
+
+			CREATE TABLE Order_detials (
+				Order_detials_ID INT NOT NULL AUTO_INCREMENT,
+				order_refrence_number INT NOT NULL,
+				product_purchased INT NOT NULL,
+				item_quantities INT NOT NULL,
+				order_detials TEXT,
+				Total DOUBLE NOT NULL,
+
+				PRIMARY KEY (Order_detials_ID),
+
+				FOREIGN KEY (order_refrence_number)
+					REFERENCES orders_improved_table(order_id)
+					ON DELETE CASCADE
+					ON UPDATE CASCADE,
+
+				FOREIGN KEY (product_purchased)
+					REFERENCES products(good_number)
+					ON DELETE RESTRICT
+					ON UPDATE CASCADE
+			);
+
+			+-----------------------+--------+------+-----+---------+----------------+
+			| Field                 | Type   | Null | Key | Default | Extra          |
+			+-----------------------+--------+------+-----+---------+----------------+
+			| Order_detials_ID      | int    | NO   | PRI | NULL    | auto_increment |
+			| order_refrence_number | int    | NO   | MUL | NULL    |                |
+			| product_purchased     | int    | NO   | MUL | NULL    |                |
+			| item_quantities       | int    | NO   |     | NULL    |                |
+			| order_detials         | text   | YES  |     | NULL    |                |
+			| Total                 | double | NO   |     | NULL    |                |
+			+-----------------------+--------+------+-----+---------+----------------+
+				   
+*****************************************************************************
+			CREATE TABLE order_status (
+				order_status_id INT AUTO_INCREMENT PRIMARY KEY,
+				order_status VARCHAR(50) NOT NULL UNIQUE
+			);
+
+			+-----------------+-------------+------+-----+---------+----------------+
+			| Field           | Type        | Null | Key | Default | Extra          |
+			+-----------------+-------------+------+-----+---------+----------------+
+			| order_status_id | int         | NO   | PRI | NULL    | auto_increment |
+			| order_status    | varchar(50) | NO   | UNI | NULL    |                |
+			+-----------------+-------------+------+-----+---------+----------------+
+			2 rows in set (0.02 sec)
+
+			INSERT INTO order_status (order_status) VALUES
+			('pending'),
+			('in_progress'),
+			('complete'),
+			('cancelled');
+
+
+*****************************************************************************
+			CREATE TABLE order_payment_status (
+				order_payment_status_id INT AUTO_INCREMENT PRIMARY KEY,
+				order_payment_status VARCHAR(50) NOT NULL UNIQUE
+			);
+
+			+-------------------------+-------------+------+-----+---------+----------------+
+			| Field                   | Type        | Null | Key | Default | Extra          |
+			+-------------------------+-------------+------+-----+---------+----------------+
+			| order_payment_status_id | int         | NO   | PRI | NULL    | auto_increment |
+			| order_payment_status    | varchar(50) | NO   | UNI | NULL    |                |
+			+-------------------------+-------------+------+-----+---------+----------------+
+			2 rows in set (0.04 sec)
+
+
+			INSERT INTO order_payment_status (order_payment_status) VALUES
+			('unpaid'),
+			('paid');
+
+************************************************************************************
+order_with_state
+
+			CREATE TABLE order_with_state (
+				order_ID INT NOT NULL,
+				order_status_id INT NOT NULL,
+				LAST_UPDATE DATETIME NOT NULL, 
+				  
+				FOREIGN KEY (order_ID)
+					REFERENCES orders_improved_table(order_ID)
+					ON DELETE CASCADE
+					ON UPDATE CASCADE,
+
+				FOREIGN KEY (order_status_id)
+					REFERENCES order_status(order_status_id)
+					ON DELETE CASCADE
+					ON UPDATE CASCADE
+			);
+
+**********************************************************************************************
+
+		CREATE TABLE order_with_state_payment (
+			order_ID INT NOT NULL,
+			order_payment_status_id INT NOT NULL,
+			LAST_UPDATE DATETIME NOT NULL, 
+			  
+			FOREIGN KEY (order_ID)
+				REFERENCES orders_improved_table(order_ID)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE,
+
+			FOREIGN KEY (order_payment_status_id)
+				REFERENCES order_payment_status(order_payment_status_id)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
+		);
+*************************************************************************************************
+
+Sample data to be used to test functions 
+
+
+[
+  {"name": "Emily Harris", "number": "+256731456872"},
+  
+  {"name": "David Johnson", "number": "+256755234109"},
+  
+  {"name": "Sophia Taylor", "number": "+256722987345"},
+  
+  {"name": "Michael Smith", "number": "+256770123456"},
+  
+  {"name": "Olivia Brown", "number": "+256745678901"},
+  
+  {"name": "Alex Anderson", "number": "+256712345678"},
+  
+  {"name": "Sarah White", "number": "+256779890234"},
+  
+  {"name": "Daniel Thomas", "number": "+256733567890"},
+  
+  {"name": "Jane Jackson", "number": "+256748901345"},
+  
+  {"name": "John Martin", "number": "+256761234789"},
+  
+  {"name": "Grace Kimani", "number": "+256770987654"},
+  
+  {"name": "Peter Okello", "number": "+256712345901"},
+  
+  {"name": "Lydia Namutebi", "number": "+256745678234"},
+  
+  {"name": "Mark Kato", "number": "+256755432198"},
+  
+  {"name": "Rachel Mugisha", "number": "+256722345678"}
+]
+
+
+**************************************************************************************************
+CREATE TABLE tax_discount_table (
+         TAX_RATE INT NOT NULL,
+         discount_amount INT NOT NULL,
+         discount_status VARCHAR(50) NOT NULL
+     );
+
+
+****************************************************************************
+
+
+CREATE TABLE order_tax_discount (
+    order_ID INT NOT NULL,
+    TAX_RATE INT NOT NULL,
+    discount_amount INT NOT NULL,
+    discount_status VARCHAR(50) NOT NULL,
+    total_payment INT NOT NULL,
+
+    FOREIGN KEY (order_ID) REFERENCES orders_improved_table(order_ID)
+);
+
+
+***********************************************************************
+ALTER TABLE orders_improved_table
+MODIFY COLUMN order_identification_number VARCHAR(255);
+
+*****************************************************************************
+
+		CREATE TABLE reservation_status (
+			reservation_status_id INT AUTO_INCREMENT PRIMARY KEY,
+			status_name VARCHAR(50) NOT NULL UNIQUE
+		);
+
+
+		+-----------------------+-------------+------+-----+---------+----------------+
+		| Field                 | Type        | Null | Key | Default | Extra          |
+		+-----------------------+-------------+------+-----+---------+----------------+
+		| reservation_status_id | int         | NO   | PRI | NULL    | auto_increment |
+		| status_name           | varchar(50) | NO   | UNI | NULL    |                |
+		+-----------------------+-------------+------+-----+---------+----------------+
+		2 rows in set (0.04 sec)
+
+
+		INSERT INTO reservation_status (status_name) VALUES
+		('Available'),
+		('Reserved'),
+		('Seated'),
+		('Completed'),
+		('Cancelled');
+***********************************************************************************
+
+table_reservations
+
+		CREATE TABLE table_reservations (
+			reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+			number_of_people INT NOT NULL,
+			reservation_notes TEXT,
+
+			resservation_date DATE NOT NULL,
+			reservation_time TIME NOT NULL,
+
+			Datetime_reservation_was_made DATETIME DEFAULT CURRENT_TIMESTAMP
+
+		);
+
+
+		+-------------------------------+----------+------+-----+-------------------+-------------------+
+		| Field                         | Type     | Null | Key | Default           | Extra             |
+		+-------------------------------+----------+------+-----+-------------------+-------------------+
+		| reservation_id                | int      | NO   | PRI | NULL              | auto_increment    |
+		| number_of_people              | int      | NO   |     | NULL              |                   |
+		| reservation_notes             | text     | YES  |     | NULL              |                   |
+		| resservation_date             | date     | NO   |     | NULL              |                   |
+		| reservation_time              | time     | NO   |     | NULL              |                   |
+		| Datetime_reservation_was_made | datetime | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+		+-------------------------------+----------+------+-----+-------------------+-------------------+
+		6 rows in set (0.00 sec
+
+***************************************************************************************
+table_reservation_status 
+
+			CREATE TABLE table_reservation_status (
+				reservation_id INT NOT NULL,
+				reservation_status_id INT NOT NULL,
+				datetime_of_status DATETIME NOT NULL,
+
+				CONSTRAINT fk_customer_reservation
+					FOREIGN KEY (reservation_id)
+					REFERENCES table_reservations(reservation_id)
+					ON DELETE CASCADE,
+
+				CONSTRAINT fk_reservation_status
+					FOREIGN KEY (reservation_status_id)
+					REFERENCES reservation_status(reservation_status_id)
+					ON DELETE RESTRICT
+			);
+
+			+-----------------------+----------+------+-----+---------+-------+
+			| Field                 | Type     | Null | Key | Default | Extra |
+			+-----------------------+----------+------+-----+---------+-------+
+			| reservation_id        | int      | NO   | MUL | NULL    |       |
+			| reservation_status_id | int      | NO   | MUL | NULL    |       |
+			| datetime_of_status    | datetime | NO   |     | NULL    |       |
+			+-----------------------+----------+------+-----+---------+-------+
+
+*******************************************************************************************
+			CREATE TABLE customer_table_reservations (
+				customer_table_reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+
+				reservation_id INT NOT NULL,
+				customer_name VARCHAR(120) NOT NULL,
+
+				CONSTRAINT fk_ctr_reservation
+					FOREIGN KEY (reservation_id)
+					REFERENCES table_reservations(reservation_id)
+					ON DELETE CASCADE
+			);
+
+
+			+-------------------------------+--------------+------+-----+---------+----------------+
+			| Field                         | Type         | Null | Key | Default | Extra          |
+			+-------------------------------+--------------+------+-----+---------+----------------+
+			| customer_table_reservation_id | int          | NO   | PRI | NULL    | auto_increment |
+			| reservation_id                | int          | NO   | MUL | NULL    |                |
+			| customer_name                 | varchar(120) | NO   |     | NULL    |                |
+			+-------------------------------+--------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+********************************************************************************************
+
+			CREATE TABLE user_reservations (
+				user_reservations_id INT AUTO_INCREMENT PRIMARY KEY,
+
+				user_id INT NOT NULL,
+				reservation_id INT NOT NULL,
+
+				CONSTRAINT fk_user_reservations_user
+					FOREIGN KEY (user_id)
+					REFERENCES user(user_id)
+					ON DELETE CASCADE,
+
+				CONSTRAINT fk_user_reservations_reservation
+					FOREIGN KEY (reservation_id)
+					REFERENCES table_reservations(reservation_id)
+					ON DELETE CASCADE,
+
+				UNIQUE (user_id, reservation_id)
+			);
+
+			+----------------------+------+------+-----+---------+----------------+
+			| Field                | Type | Null | Key | Default | Extra          |
+			+----------------------+------+------+-----+---------+----------------+
+			| user_reservations_id | int  | NO   | PRI | NULL    | auto_increment |
+			| user_id              | int  | NO   | MUL | NULL    |                |
+			| reservation_id       | int  | NO   | MUL | NULL    |                |
+			+----------------------+------+------+-----+---------+----------------+
+			3 rows in set (0.00 sec)
+
+******************************************************************************
+
+			CREATE TABLE table_reservation_link (
+				table_reservation_link_id INT AUTO_INCREMENT PRIMARY KEY,
+				table_id INT NOT NULL,
+				reservation_id INT NOT NULL,
+				CONSTRAINT fk_table
+					FOREIGN KEY (table_id)
+					REFERENCES tables(Table_db_id)
+					ON DELETE CASCADE,
+				CONSTRAINT fk_reservation
+					FOREIGN KEY (reservation_id)
+					REFERENCES table_reservations(reservation_id)
+					ON DELETE CASCADE
+			);
+
+			+---------------------------+------+------+-----+---------+----------------+
+			| Field                     | Type | Null | Key | Default | Extra          |
+			+---------------------------+------+------+-----+---------+----------------+
+			| table_reservation_link_id | int  | NO   | PRI | NULL    | auto_increment |
+			| table_id                  | int  | NO   | MUL | NULL    |                |
+			| reservation_id            | int  | NO   | MUL | NULL    |                |
+			+---------------------------+------+------+-----+---------+----------------+
+			3 rows in set (0.05 sec)
+
+
+***************************************************************************************************
+
+Audit_log  
+
+			CREATE TABLE Audit_Logs (
+				audit_ID INT AUTO_INCREMENT PRIMARY KEY,
+				audit_reference_number VARCHAR(50) NOT NULL,
+				action VARCHAR(255),
+				audit_date DATE,
+				audit_time TIME,
+				done_by VARCHAR(100)
+			);
+
+***************************************************************************************************
+			CREATE TABLE Description_audit (
+				description_audit_id INT AUTO_INCREMENT PRIMARY KEY,
+				description_title VARCHAR(255) NOT NULL
+			);
+
+			INSERT INTO Description_audit (description_title)
+			VALUES
+				('LOG-IN'),
+				('ORDER'),
+				('ITEM'),
+				('TABLE_RESERVATION');
+
+
+*************************************************************************************************
+			CREATE TABLE audit_desc (
+				audit_ID INT NOT NULL,
+				description_audit_id INT NOT NULL,
+				PRIMARY KEY (audit_ID, description_audit_id),
+				FOREIGN KEY (audit_ID) REFERENCES Audit_Logs(audit_ID),
+				FOREIGN KEY (description_audit_id) REFERENCES Description_audit(description_audit_id)
+			);
+			
+****************************************************************************************************			
+CREATE TABLE Products_quantity (
+    Products_quantity_ID INT AUTO_INCREMENT PRIMARY KEY,
+    good_number INT NOT NULL,
+    products_Quantity INT NOT NULL,
+
+    CONSTRAINT fk_products_quantity_product
+        FOREIGN KEY (good_number)
+        REFERENCES products(good_number)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+			
++----------------------+------+------+-----+---------+----------------+
+| Field                | Type | Null | Key | Default | Extra          |
++----------------------+------+------+-----+---------+----------------+
+| Products_quantity_ID | int  | NO   | PRI | NULL    | auto_increment |
+| good_number          | int  | NO   | MUL | NULL    |                |
+| products_Quantity    | int  | NO   |     | NULL    |                |
++----------------------+------+------+-----+---------+----------------+
+3 rows in set (0.04 sec)
+
+INSERT INTO Products_quantity (good_number, products_Quantity) VALUES
+(1, 85),
+(2, 88),
+(3, 81),
+(4, 90),
+(5, 84),
+(6, 87),
+(7, 82),
+(8, 89),
+(9, 86),
+(10, 83),
+(11, 80),
+(12, 88),
+(13, 85),
+(14, 90),
+(15, 82),
+(16, 87),
+(17, 84),
+(18, 89),
+(19, 81),
+(20, 86),
+(21, 83),
+(22, 88),
+(23, 85),
+(24, 90),
+(25, 82),
+(26, 87),
+(27, 84),
+(28, 89),
+(29, 81),
+(30, 86),
+(31, 83),
+(32, 88),
+(33, 85);
+
+			
+**************************************************************************************************			
+			
+	CREATE TABLE product_category_quantites (
+    product_category_quantites_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_category_number INT NOT NULL,
+    product_categories_quantities INT NOT NULL,
+
+    CONSTRAINT fk_category_quantities_category
+        FOREIGN KEY (product_category_number)
+        REFERENCES product_categories(product_category_number)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+ 		
++-------------------------------+------+------+-----+---------+----------------+
+| Field                         | Type | Null | Key | Default | Extra          |
++-------------------------------+------+------+-----+---------+----------------+
+| product_category_quantites_id | int  | NO   | PRI | NULL    | auto_increment |
+| product_category_number       | int  | NO   | MUL | NULL    |                |
+| product_categories_quantities | int  | NO   |     | NULL    |                |
++-------------------------------+------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+			
+****************************************************************************************************			
+			
+
+CREATE TABLE Inventory_product_tracker (
+    Inventory_product_tracker_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    Inventory_product_tracker_reference_number VARCHAR(50) NOT NULL,
+    -- Example: IPT-12-45#
+
+    Inventory_product INT NOT NULL,
+    reducted_qty INT NOT NULL,
+
+    CONSTRAINT fk_inventory_product
+        FOREIGN KEY (Inventory_product)
+        REFERENCES products(good_number)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+		
+			
+**************************************************************************************************************			
+	CREATE TABLE Inventory_product_tracker_status (
+    Inventory_product_tracker_status_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Inventory_product_tracker_status VARCHAR(30) NOT NULL UNIQUE
+);
+
++-------------------------------------+-------------+------+-----+---------+----------------+
+| Field                               | Type        | Null | Key | Default | Extra          |
++-------------------------------------+-------------+------+-----+---------+----------------+
+| Inventory_product_tracker_status_ID | int         | NO   | PRI | NULL    | auto_increment |
+| Inventory_product_tracker_status    | varchar(30) | NO   | UNI | NULL    |                |
++-------------------------------------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+INSERT INTO Inventory_product_tracker_status 
+(Inventory_product_tracker_status)
+VALUES
+('IN_STOCK'),          -- qty > 70%
+('MID_STOCK'),         -- 40% - 70%
+('APPROACHING_LOW'),   -- 20% - 40%
+('LOW_STOCK'),         -- 1% - 20%
+('OUT_OF_STOCK');      -- 0
+************************************************************************************************************************
+CREATE TABLE IVENTORY_CHECK (
+    IVENTORY_CHECK_ID INT AUTO_INCREMENT PRIMARY KEY,
+
+    Products_quantity_ID INT NOT NULL,
+    Inventory_product_tracker_id INT NOT NULL,
+    Inventory_product_tracker_status_ID INT NOT NULL,
+
+    CONSTRAINT fk_check_products_quantity
+        FOREIGN KEY (Products_quantity_ID)
+        REFERENCES Products_quantity(Products_quantity_ID)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_check_product_tracker
+        FOREIGN KEY (Inventory_product_tracker_id)
+        REFERENCES Inventory_product_tracker(Inventory_product_tracker_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_check_tracker_status
+        FOREIGN KEY (Inventory_product_tracker_status_ID)
+        REFERENCES Inventory_product_tracker_status(Inventory_product_tracker_status_ID)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
+
+
+**********************************************************************************************
+INSERT INTO product_category_quantites (product_category_number, product_categories_quantities)
+SELECT 
+    pct.product_category_number,
+    SUM(pq.products_Quantity) AS category_total
+FROM products_category_table pct
+JOIN Products_quantity pq
+    ON pq.good_number = pct.product_number
+GROUP BY pct.product_category_number;
+
+
++----------------------------------+
+| Tables_in_bakery_busness         |
++----------------------------------+
+| audit_desc                       |
+| audit_logs                       |
+| customer_order                   |
+| customer_table_reservations      |
+| description_audit                |
+| inventory_product_tracker        |
+| inventory_product_tracker_status |
+| iventory_check                   |
+| order_categories                 |
+| order_detials                    |
+| order_payment_status             |
+| order_status                     |
+| order_with_categories            |
+| order_with_state                 |
+| order_with_state_payment         |
+| orders_improved_table            |
+| product_categories               |
+| product_category_quantites       |
+| products                         |
+| products_category_table          |
+| products_quantity                |
+| reservation_status               |
+| table_floor                      |
+| table_reservation_link           |
+| table_reservation_status         |
+| table_reservations               |
+| tables                           |
+| user                             |
+| user_reservations                |
++----------------------------------+

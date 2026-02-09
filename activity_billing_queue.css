@@ -1,0 +1,740 @@
+body {
+    margin: 0;
+    background: #f5f5f5;
+    overflow-x: hidden;
+}
+
+/* SIDEBAR */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #222;
+    overflow-x: hidden;
+    padding-top: 20px;
+    transition: width 0.3s ease;
+    color: white;
+    z-index: 200;
+}
+.sidebar.active {
+    width: 170px;
+}
+.sidebar a {
+    display: block;
+    padding: 10px 0;
+    color: #ddd;
+    text-decoration: none;
+}
+.sidebar a:hover {
+    color: white;
+}
+
+/* TOP BAR */
+.top-bar {
+    width: 100%;
+    background: #edeff0;
+    padding: 10px;
+    font-weight: bold;
+    position: relative;
+    z-index: 150;
+}
+.menu-icon {
+    font-size: 26px;
+    cursor: pointer;
+    color: blue;
+}
+
+/* ORDER TOGGLE */
+.close-order {
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+}
+.open-order {
+    color: green;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* ORDER PANEL */
+.order-container {
+    width: 25%;
+    min-width: 250px;
+    background: white;
+    height: 100%;
+    position: fixed;
+    right: -25%;
+    top: 0;
+    transition: right 0.4s ease;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+}
+.order-container.active {
+    right: 0;
+    pointer-events: auto;
+}
+.order-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* buttons left & right */
+    border-bottom: 1px solid #ccc;
+    padding: 5px 10px;
+    position: relative; /* needed for absolute centering of middle */
+}
+
+.order-top-bar {
+    background-color: #0d6efd; /* Blue background */
+    text-align: center;
+    padding: 20px 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.order-panel-title {
+    margin: 0;
+    color: white;       /* White text on blue */
+    font-size: 28px;    /* Large text */
+    font-weight: bold;  /* Bold */
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* MAIN SHIFT */
+#activityMain {
+    transition: margin 0.3s ease;
+}
+#activityMain.shifted-left { margin-left: 170px; }
+#activityMain.shifted-right { margin-right: 25%; }
+.shifted-left-time { margin-left: 170px; }
+.shifted-right-time { margin-right: 25%; }
+
+/* INPUTS */
+.form-control.rounded-input {
+    background-color: #edeff0 !important;
+    border-radius: 14px;
+    padding: 14px 18px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    font-size: 15px;
+}
+.form-control.rounded-input:focus {
+    background-color: #edeff0 !important;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+}
+.form-control.rounded-input::placeholder {
+    color: #6c757d;
+}
+
+/* VERTICAL NAV */
+.vertical-container {
+    background-color: #edeff0;
+    border-radius: 14px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: calc(100vh - 80px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.vertical-container a {
+    text-align: center;
+    font-weight: bold;
+    color: black;
+    text-decoration: none;
+    padding: 12px 0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+.vertical-container a:hover,
+.vertical-container a.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* BREADCRUMB */
+.breadcrumb { display: flex; align-items: center; }
+.breadcrumb-main { font-weight: 700; color: #0d6efd; font-size: 18px; }
+.breadcrumb-sub { font-weight: 400; color: #6c757d; font-size: 14px; margin-left: 5px; }
+
+/* DATE BOX */
+.date-box {
+    background: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.icon-button { background: white; border: none; padding: 2px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.icon-img { width: 16px; height: 16px; object-fit: contain; }
+#dateText { font-size: 14px; color: #333; font-weight: 500; }
+
+/* PILLS */
+.pill-wrapper { display: flex; gap: 10px; }
+.pill-btn {
+    min-width: 140px;
+    max-width: 160px;
+    background-color: #edeff0;
+    border: 1.5px solid transparent;
+    color: #6c757d;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.pill-btn:hover { border-color: #0d6efd; color: #0d6efd; }
+
+/* ACTIVITY DISPLAY SCREEN */
+.activity-display-screen {
+    width: 100%;
+    background-color: #edeff0;
+    border-radius: 14px;
+    padding: 20px;
+    min-height: 400px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.activity-display-text { color: #6c757d; font-size: 14px; }
+
+.display-screen {
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+
+/* =============================== */
+/* ORDER CARDS – HORIZONTAL SCROLL */
+/* =============================== */
+
+/* Container holding all order cards */
+#orderCardsContent {
+    display: flex;
+    flex-direction: row;          /* 🔑 horizontal layout */
+    flex-wrap: nowrap;            /* no wrapping */
+
+    gap: 14px;
+    padding: 14px;
+
+    overflow-x: auto;             /* horizontal scroll */
+    overflow-y: hidden;
+
+    background-color: #edeff0;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+
+    scroll-behavior: smooth;
+    white-space: nowrap;
+}
+
+/* Individual order card */
+.order-card {
+    flex: 0 0 260px;              /* fixed width cards */
+    min-width: 260px;
+    max-width: 260px;
+
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 12px;
+
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Hover effect */
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* Header section */
+.order-header {
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 6px;
+}
+
+/* Items list */
+.items-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Item row */
+.item-row {
+    font-size: 13px;
+    color: #333;
+}
+
+/* See more button */
+.see-more-btn {
+    align-self: flex-start;
+    background: transparent;
+    color: #0d6efd;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0;
+    cursor: pointer;
+}
+
+.see-more-btn:hover {
+    text-decoration: underline;
+}
+
+/* Footer */
+/* Horizontal scrollbar styling */
+#orderCardsContent::-webkit-scrollbar {
+    height: 10px;
+}
+
+#orderCardsContent::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+#orderCardsContent::-webkit-scrollbar-thumb {
+    background-color: #4da6ff;
+    border-radius: 5px;
+    border: 2px solid #f1f1f1;
+}
+
+/* Footer layout: label left, value right */
+.order-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;   /* 🔑 pushes value to the end */
+    align-items: center;
+
+    border-top: 1px dashed #ccc;
+    padding-top: 6px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* Total items value in red */
+.total-items-value {
+    color: red;
+    font-weight: bold;
+}
+
+/* ============================ */
+/* ORDER PANEL                   */
+/* ============================ */
+/* Display screen for vertical cards */
+#orderContainer .billing-panel-cards-display {
+    width: 100%;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 10px;
+
+    display: flex;
+    flex-direction: column;  /* vertical stacking */
+    gap: 16px;
+
+    max-height: 600px;       /* optional, limits total height */
+    overflow-y: auto;        /* vertical scroll if many cards */
+}
+
+/* Card wrapper */
+#orderContainer .billing-panel-cards-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Individual card */
+#orderContainer .billing-panel-card {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
+
+    min-height: calc(1.2em * 3 + 16px); /* height for 3 lines + padding */
+    overflow: hidden;
+    transition: min-height 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover effect */
+#orderContainer .billing-panel-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* Lines inside card */
+#orderContainer .billing-panel-card .line {
+    font-size: 14px;
+    color: #333;
+}
+
+/* Hide lines beyond 3 before click */
+#orderContainer .billing-panel-card .line:nth-child(n+4) {
+    display: none;
+}
+
+/* Expanded card */
+#orderContainer .billing-panel-card.expanded {
+    min-height: calc(1.2em * 9 + 16px); /* height for 9 lines + padding */
+    background-color: #e0f0ff;
+}
+
+/* Show all lines when expanded */
+#orderContainer .billing-panel-card.expanded .line {
+    display: block;
+}
+
+#orderDisplayScreen {
+    margin-top: 10px;
+    padding: 0;
+    overflow-y: auto;
+    height: calc(100% - 80px); /* header height adjustment */
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* smaller gap for compact cards */
+}
+
+.order-card p {
+    margin: 3px 0;
+}
+
+.extra-content p {
+    margin: 3px 0;
+}
+
+.save-btn {
+    margin-top: 8px;
+    padding: 6px 10px;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.save-btn:hover {
+    background-color: #0b5ed7;
+}
+
+/* ================================ */
+/* RECTANGULAR ORDER DISPLAY SCREEN */
+/* ================================ */
+
+.order-rectangle-screen {
+    flex: 1;
+    overflow-y: auto;
+    background: #edeff0;
+}
+
+/* COLLAPSED = EXACTLY 3 LINES */
+.order-rectangle.collapsed {
+    height: 78px; /* 3 text lines */
+}
+
+/* TEXT STYLES */
+.rect-line-1 {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.rect-line-2 {
+    font-size: 14px;
+    color: #333;
+}
+
+.rect-line-3 {
+    font-size: 13px;
+    color: #666;
+}
+
+/* EXTRA DETAILS (HIDDEN BY DEFAULT) */
+.rect-extra {
+    margin-top: 8px;
+    font-size: 13px;
+    display: none;
+}
+
+/* SAVE BUTTON */
+.rect-save-btn {
+    margin-top: 8px;
+    padding: 6px;
+    width: 100%;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+.rectangle-cards-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+}
+
+.order-rectangle {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #f2f8ff;
+    overflow: hidden;
+    max-height: 60px; /* collapsed height */
+}
+
+.order-rectangle.expanded {
+    max-height: 500px; /* expanded height */
+}
+
+
+.rect-line-1, .rect-line-2, .rect-line-3,
+.rect-extra div {
+    font-weight: bold;  /* reinforce bold */
+    color: #000;        /* ensure visible */
+}
+
+.order-rectangle {
+    padding: 12px 14px;     /* keeps some spacing */
+    font-size: 15px;
+    line-height: 1.4em;     /* ensures proper spacing between lines */
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: #f2f8ff;
+}
+
+.order-rectangle.collapsed {
+    max-height: calc(3 * 1.4em + 24px); /* 3 lines + padding */
+}
+
+.order-rectangle.expanded {
+    max-height: 550px;
+    background-color: #f8f9fa;
+}
+
+.rect-extra {
+    display: none;
+}
+
+
+/* ================================ */
+/* RECTANGULAR ORDER DISPLAY SCREEN */
+/* ================================ */
+
+.order-rectangle-screen {
+    flex: 1;
+    overflow-y: auto;
+    background: #edeff0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* RECTANGLE CARD */
+
+
+/* LINES BEFORE CLICK */
+.rect-line-1,
+.rect-line-2,
+.rect-line-3 {
+    font-weight: bold;
+    font-size: 14px;
+    margin: 2px 0;
+}
+
+/* EXTRA DETAILS (HIDDEN BY DEFAULT) */
+.rect-extra {
+    margin-top: 8px;
+    display: none;
+    font-weight: bold;
+    font-size: 13px;
+    
+}
+
+/* SAVE BUTTON */
+.rect-save-btn {
+    margin-top: 8px;
+    padding: 6px 10px;
+    width: 100%;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease;
+}
+
+.rect-save-btn:hover {
+    background-color: #0b5ed7;
+}
+
+/* Hide extra content and collapse button when collapsed */
+.order-rectangle.collapsed .rect-extra {
+    display: none;
+}
+
+/* Show extra content and collapse button when expanded */
+.order-rectangle.expanded .rect-extra {
+    display: block;
+}
+
+
+/* Collapse button */
+.rect-collapse-btn {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.rect-collapse-btn:hover {
+    background-color: #ff4c4c;
+}
+
+/* Optional: smooth expand/collapse animation */
+.order-rectangle {
+    transition: max-height 0.4s ease, padding 0.3s ease;
+}
+
+/* =========================
+   STATUS PILL (ORDER STATE)
+========================= */
+.status-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    display: inline-block;
+    white-space: nowrap;
+    animation: statusPulse 0.5s ease-in-out;
+}
+
+/* Status colors */
+.status-loading {
+    background-color: #007bff; /* blue */
+}
+
+.status-kitchen {
+    background-color: #ffc107; /* yellow */
+    color: #000;
+}
+
+.status-complete {
+    background-color: #28a745; /* green */
+}
+
+.status-cancelled {
+    background-color: #dc3545; /* red */
+}
+
+.status-default {
+    background-color: #6c757d; /* fallback gray */
+}
+
+@keyframes statusPulse {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.activity-display-screen {
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 6px;
+
+    /* Keep original size but scroll if content overflows */
+    max-height: 400px;     /* Adjust this to match your original design */
+    overflow-y: auto;      /* Vertical scrolling */
+    overflow-x: hidden;    /* Prevent horizontal scroll */
+}
+
+.queue-row {
+    font-size: 14px;
+}
+
+.queue-top {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.queue-middle {
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.queue-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.order-date {
+    font-size: 12px;
+    color: #666;
+}
+.status-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.pill-active {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.pill-closed {
+    background-color: #28a745;
+    color: white;
+}
+
+.queue-divider {
+    margin: 10px 0;
+    border: none;
+    border-bottom: 1px solid #ddd;
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Logs</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body {
+        padding: 20px;
+        background-color: #f5f5f5;
+        font-family: Arial, sans-serif;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    /* Scrollable table container */
+    .table-container {
+        max-height: 500px; /* adjust as needed */
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    table.audit-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed; /* fixed layout for column widths */
+        word-wrap: break-word;
+    }
+
+    table.audit-table th, table.audit-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border: 1px solid #ddd;
+        vertical-align: top; /* allows rows to expand */
+        white-space: normal; /* allow multi-line content */
+    }
+
+    /* COLUMN WIDTHS */
+    table.audit-table th:nth-child(1) { width: 12%; } /* Audit ref */
+    table.audit-table th:nth-child(2) { width: 18%; } /* Description */
+    table.audit-table th:nth-child(3) { width: 25%; } /* Action widest */
+    table.audit-table th:nth-child(4) { width: 15%; } /* Date */
+    table.audit-table th:nth-child(5) { width: 15%; } /* Time */
+    table.audit-table th:nth-child(6) { width: 15%; } /* Done by */
+
+    /* HEADER STYLES */
+    table.audit-table th:nth-child(1) { color: black; background-color: green; position: sticky; top: 0; z-index: 2; }
+    table.audit-table th:nth-child(2),
+    table.audit-table th:nth-child(3),
+    table.audit-table th:nth-child(4),
+    table.audit-table th:nth-child(5) { color: purple; background-color: yellow; position: sticky; top: 0; z-index: 2; }
+    table.audit-table th:nth-child(6) { color: red; background-color: green; position: sticky; top: 0; z-index: 2; }
+
+    /* Hover effect */
+    table.audit-table tr:hover { background-color: #f1f1f1; }
+</style>
+</head>
+    <body>
+
+            <h2>Audit Logs</h2>
+
+            <div class="table-container">
+                <table class="audit-table" id="auditTable">
+                    <thead>
+                        <tr>
+                            <th>Audit reference number</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                            <th>Date</th>
+                            <th>TIME</th>
+                            <th>Done by</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Initially empty -->
+                    </tbody>
+                </table>
+            </div>
+
+            <script>
+                const auditTableBody = document.querySelector('#auditTable tbody');
+
+                /**
+                 * Adds a new row to the audit table.
+                 * Rows expand dynamically if content is long.
+                 */
+                function addAuditRow(refNum, description, action, date, time, doneBy) {
+                    const row = document.createElement('tr');
+
+                    [refNum, description, action, date, time, doneBy].forEach(val => {
+                        const td = document.createElement('td');
+                        td.textContent = val || '';
+                        row.appendChild(td);
+                    });
+
+                    auditTableBody.appendChild(row);
+                }
+
+                /**
+                 * Clears the table body
+                 */
+                function clearTable() {
+                    auditTableBody.innerHTML = '';
+                }
+
+                /**
+                 * Adds a row to the table
+                 */
+                function addAuditRow(refNum, description, action, date, time, doneBy) {
+                    const row = document.createElement('tr');
+                    [refNum, description, action, date, time, doneBy].forEach(val => {
+                        const td = document.createElement('td');
+                        td.textContent = val || '';
+                        row.appendChild(td);
+                    });
+                    auditTableBody.appendChild(row);
+                }
+
+                /**
+                 * Fetch data from backend API and populate table
+                 */
+                async function fetchAuditLogs() {
+                    try {
+                        const response = await fetch('get_audit_logs');
+                        const data = await response.json();
+
+                        clearTable(); // clear existing rows
+
+                        data.forEach(item => {
+                            addAuditRow(
+                                item.audit_reference_number,
+                                item.description,
+                                item.action,
+                                item.audit_date,
+                                item.audit_time,
+                                item.done_by
+                            );
+                        });
+                    } catch (err) {
+                        console.error('Error fetching audit logs:', err);
+                    }
+                }
+
+                // Fetch immediately
+                fetchAuditLogs();
+
+                // Refresh table every 5 seconds
+                setInterval(fetchAuditLogs, 5000);
+
+            </script>
+
+    </body>
+</html>

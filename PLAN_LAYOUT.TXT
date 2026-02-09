@@ -1,0 +1,257 @@
+
+ Table_display_Inventory
+ 
++-------------------------------+---------------------+--------------------+ 
+| products_quantity.good_number | products.good_name  | product.image_path | 
++-------------------------------+---------------------+--------------------+
+|                               |                     |                    |
++-------------------------------+---------------------+--------------------+
+
+
+
+
+
+
+
+
+
+products_category_table
++-------------------------+------+------+-----+---------+-------+
+| Field                   | Type | Null | Key | Default | Extra |
++-------------------------+------+------+-----+---------+-------+
+| product_number          | int  | NO   | MUL | NULL    |       |
+| product_category_number | int  | NO   | MUL | NULL    |       |
++-------------------------+------+------+-----+---------+-------+
+2 rows in set (0.04 sec)
+
+
+products_quantity
++----------------------+------+------+-----+---------+----------------+
+| Field                | Type | Null | Key | Default | Extra          |
++----------------------+------+------+-----+---------+----------------+
+| Products_quantity_ID | int  | NO   | PRI | NULL    | auto_increment |
+| good_number          | int  | NO   | MUL | NULL    |                |
+| products_Quantity    | int  | NO   |     | NULL    |                |
++----------------------+------+------+-----+---------+----------------+
+3 rows in set (0.06 sec)
+
+
+
++----------------------------------+
+| Tables_in_bakery_busness         |
++----------------------------------+
+| audit_desc                       |
+| audit_logs                       |
+| customer_order                   |
+| customer_table_reservations      |
+| description_audit                |
+| inventory_product_tracker        |
+| inventory_product_tracker_status |
+| iventory_check                   |
+| order_categories                 |
+| order_detials                    |
+| order_payment_status             |
+| order_status                     |
+| order_with_categories            |
+| order_with_state                 |
+| order_with_state_payment         |
+| orders_improved_table            |
+| product_categories               |
+| product_category_quantites       |
+| products                         |
+| products_category_table          |
+| products_quantity                |
+| reservation_status               |
+| table_floor                      |
+| table_reservation_link           |
+| table_reservation_status         |
+| table_reservations               |
+| tables                           |
+| user                             |
+| user_reservations                |
++----------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

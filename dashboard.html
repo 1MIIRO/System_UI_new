@@ -1,0 +1,991 @@
+  
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        .search-container {
+            transition: margin 0.3s ease;
+        }
+
+         /* SHIFT CLASSES */
+        .shifted-left { margin-left: 200px; }
+        .shifted-right { margin-right: 25%; } /* matches order panel width */
+        .shifted-left-time, .shifted-right-time { transition: margin 0.3s ease; }
+
+        /* PRODUCT DISPLAY */
+        .product-display {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 10px;
+            transition: margin 0.3s ease;
+        }
+
+        .product-display.shifted-right {
+            margin-right: 25%;
+        }
+
+        .product-card {
+            background: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+        }
+
+        .product-card:hover { transform: translateY(-5px); cursor: pointer; }
+
+        .product-card img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-name { font-weight: bold; font-size: 16px; margin-top: 8px; }
+        .product-price { color: green; font-size: 15px; margin-top: 5px; }
+       
+         .order-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+            background: #fdf2f2;
+            border: none;
+        }
+   
+   </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="sidebar">
+        <div class="p-3">
+            <h5>{{ user.personal_name }}</h5>
+            <p>{{ user.job_desc }}</p>
+        </div>
+        <ul class="list-unstyled ps-3">
+            <li>
+                <a href="{{ url_for('dashboard') }}">Point_of_sales</a>
+            </li>
+            <li>
+                <a href="{{ url_for('activity_billing_queue') }}">Activity</a>
+            </li>
+            <li>
+                <a href="{{ url_for('audit_logs') }}">Audit logs</a>
+            </li>
+            <!-- New Inventory link -->
+            <li>
+                <a href="{{ url_for('inventory_page') }}">Inventory</a>
+            </li>
+            <li><a href="#">Teams</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </div>
+
+    <!-- ORDER PANEL -->
+    <div id="orderContainer" class="order-container">
+        <div class="order-top-bar" style="display:flex; align-items:center; gap:10px;">
+            <!-- Left notepad button -->
+            <button id="notepadButton" class="btn btn-light btn-sm">
+                <img src="{{ url_for('static', filename='images/nootpad_icon.jpg') }}" style="width:16px;">
+            </button>
+
+            <!-- Hidden field to show current description -->
+             <div id="currentDescription" style="display:none;">{{ order_description }}</div>
+
+            <!-- Editable texts in the middle -->
+            <div class="order-texts" style="display:flex; flex-direction:column; flex:1; gap:2px;">
+                <div id="customerName" contenteditable="false" class="editable-text">Customer Name</div> 
+                <div>
+                    <strong><span id="orderNumber"style="color:#e74c3c; font-weight:bold; font-size:20px;">Loading...</span></strong>
+                </div>
+
+            </div>
+            
+            <!-- Right pencil button -->
+            <button id="editPencil" class="btn btn-light btn-sm">
+                <img src="{{ url_for('static', filename='images/pencil_icon.jpg') }}" style="width:16px;">
+            </button>
+        </div>
+
+        <div class="order-dropdowns p-2">
+            <div class="dropdown">
+                <button class="dropdown-btn">Select Table ▼</button>
+                <div class="dropdown-content" style="display:none; border: 1px solid #ccc; background: #fff; position: absolute; z-index: 1000; max-height: 200px; overflow-y: auto;">
+                    {% for table in tables %}
+                        <div class="dropdown-item" data-id="{{ table.Table_db_id }}" style="padding: 5px 10px; cursor: pointer; display:flex; align-items:center; gap:8px;">
+                            <span class="dot" style="width:8px; height:8px; border-radius:50%; background:transparent; display:inline-block;"></span>
+                            {{ table.Table_number }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropdown-btn">Select Order Type ▼</button>
+                <div class="dropdown-content" style="display:none; border: 1px solid #ccc; background: #fff; position: absolute; z-index: 1000; max-height: 200px; overflow-y: auto;">
+                    {% for category in order_categories %}
+                        <div class="dropdown-item" data-id="{{ category.order_categories_ID }}" style="padding: 5px 10px; cursor: pointer; display:flex; align-items:center; gap:8px;">
+                            <span class="dot" style="width:8px; height:8px; border-radius:50%; background:transparent; display:inline-block;"></span>
+                            {{ category.order_categories_name }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="order-display-screens" style="display:flex; flex-direction:column; gap:10px; margin-top:0px;">
+            <!-- Display Screen 1 (twice as big) -->
+            <div class="display-screen display-screen-1">
+                <div id="orderItems" style="display:flex; flex-direction:column; gap:5px;">
+                      <!-- Selected products will appear here -->
+                 </div>
+            </div>
+
+            <!-- Display Screen 2 -->
+            <div class="display-screen display-screen-2">
+                <div class="billing-summary">
+                    
+                    <div class="billing-row">
+                        <span>Subtotal</span>
+                        <span class="amount">$</span>
+                    </div>
+
+                    <div class="billing-row">
+                        <span>Tax (10%)</span>
+                        <span id="taxAmount" class="amount1">$0.00</span>
+                    </div>
+
+                    <div class="billing-row">
+                            <span>Discount</span>
+                            <span id="discountDisplay" class="amount">0%</span>
+                    </div>
+
+                    <div class="billing-separator"></div>
+
+                    <div class="billing-row total">
+                        <span>TOTAL</span>
+                        <span id="totalAmount" class="amount">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="order-button-container">
+
+            <!-- TOP ROW -->
+            <div class="button-top">
+                <button class="pill-btn_order">Promo-code</button>
+                <button class="pill-btn_order">QRS</button>
+            </div>
+
+            <!-- BOTTOM ROW -->
+            <div class="button-bottom">
+                <button class="big-action-btn">PLACE ORDER</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="top-bar d-flex align-items-center">
+        <div id="menuToggle" class="menu-icon">&#9776;</div>
+        <div class="date-box ms-3 top-bar-item">
+           <button class="icon-button">
+                <img src="{{ url_for('static', filename='images/calendar_icon.jpg') }}" 
+                    alt="date_icon" 
+                    class="icon-img">
+           </button>
+          <span id="dateText">--/--/----</span>
+        </div>
+
+        <div class="time-box ms-3 top-bar-item">
+            <button class="icon-button">
+                <img src="{{ url_for('static', filename='images/clock_icon.jpg') }}" 
+                    alt="date_icon" 
+                    class="icon-img">
+           </button>
+            <span id="timeText">--:--:--</span>
+        </div>
+        <div id="orderToggle" class="ms-auto open-order top-bar-item">Open Order</div>
+    </div>
+
+    <!-- BUTTON CONTAINER -->
+     <div id="buttonsContainer" class="buttons-container">
+        <!-- Keep ALL_Menu button static -->
+       <button class="dashboard-btn" data-category-name="ALL">
+            <img src="{{ url_for('static', filename='images/menu_icon.png') }}" alt="All Menu" class="btn-icon"> ALL_Menu
+        </button>
+    </div>
+
+
+    <!-- SEARCH BAR -->
+    <div id="searchContainer" class="search-container mt-3">
+        <div class="input-group">
+            <input type="text" id="searchInput" placeholder="Search for something sweet on your mind" class="form-control">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+        </div>
+    </div>
+  
+     <!-- Product Display -->
+    <div class="product-display">
+    {% for item in products %}
+        <div class="product-card"
+            data-name="{{ item['good_name'] }}"
+            data-description="{{ item['description'] }}"
+            data-price="{{ item['price'] }}"
+            data-category="{{ product_category_map[item['good_number']] or 'Uncategorized' }}">
+
+            <img src="{{ url_for('static', filename=item.image_path.replace('\\','/').split('static/')[1]) }}"
+                alt="{{ item.good_name }}">
+
+            <div class="product-name">{{ item.good_name }}</div>
+            <div class="product-price">${{ item.price }}</div>
+            <div class="product-category" style="font-size:12px; color:#555;">
+                {{ product_category_map[item['good_number']] or 'Uncategorized' }}
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div id="productModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+        <div class="modal-content" style="background:white; border-radius:10px; max-width:400px; width:90%; padding:20px; position:relative; display:flex; flex-direction:column; gap:10px;">
+            
+            <!-- CLOSE BUTTON -->
+            <span id="closeModal" style="position:absolute; top:10px; right:15px; font-size:20px; cursor:pointer;">&times;</span>
+
+            <!-- PRODUCT IMAGE -->
+            <div style="display:flex; justify-content:center;">
+                <img id="modalImage" src="" alt="Product Image" style="width:80%; height:150px; object-fit:cover; border-radius:8px;">
+            </div>
+
+            <!-- PRODUCT CATEGORY -->
+            <div id="modalCategory" style="font-size:13px; color:#555;">Category Name</div>
+
+            <!-- PRODUCT NAME -->
+            <div id="modalName" style="font-weight:bold; font-size:16px;">Product Name</div>
+
+            <!-- PRODUCT DESCRIPTION -->
+            <p id="modalDescription" style="font-size:14px; color:#333; margin:0;">Product Description</p>
+
+            <!-- PRODUCT PRICE -->
+            <div id="modalPrice" style="font-weight:bold; color:green;">$0.00</div>
+
+            <!-- TEXT FIELD FOR ORDER DETAILS -->
+            <textarea id="orderDetails" placeholder="Add order notes..." style="width:100%; min-height:60px; border:1px solid #ccc; border-radius:6px; padding:5px; resize:none;"></textarea>
+
+            <!-- QUANTITY SELECTOR -->
+            <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:5px;">
+                <button id="decreaseQty" style="padding:5px 10px;">-</button>
+                <span id="qtyCounter" style="font-weight:bold; min-width:20px; text-align:center;">1</span>
+                <button id="increaseQty" style="padding:5px 10px;">+</button>
+            </div>
+
+            <!-- ADD TO KART BUTTON -->
+            <button id="selectBtn" style="width:100%; padding:10px; background:#0d6efd; color:white; border:none; border-radius:8px; cursor:pointer;">
+                ADD TO KART
+            </button>
+
+        </div>
+    </div>
+
+    <!-- LEFT FLOATING TOGGLE (INDEPENDENT) -->
+    <div id="trackOrderToggle" class="track-order-toggle">
+        <span class="toggle-symbol">+</span>
+        <span class="toggle-text">Track orders</span>
+    </div>
+
+        <div id="trackDrawer">
+            <div id="trackHandle">
+                <span id="trackSymbol">+</span>
+                <span class="track-text">Track Orders</span>
+            </div>
+
+            <div id="trackDrawerContent">
+                <div class="track-scroll">
+                    <!-- Orders will go here -->
+                </div>
+            </div>
+        </div>
+
+    <!-- NOTEPAD MODAL -->
+    <div id="notepadModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+        <div style="background:white; border-radius:10px; max-width:500px; width:90%; padding:20px; position:relative; display:flex; flex-direction:column; gap:10px;">
+            <span id="closeNotepad" style="position:absolute; top:10px; right:15px; font-size:20px; cursor:pointer;">&times;</span>
+            <h5>Order Notes</h5>
+            <div id="allNotesContainer" style="display:flex; flex-direction:column; gap:10px; max-height:400px; overflow-y:auto;"></div>
+            <button id="saveNotes" style="padding:8px; background:#0d6efd; color:white; border:none; border-radius:6px; cursor:pointer;">Save Notes</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+    // DATE & TIME
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('dateText').textContent = now.toLocaleDateString();
+            document.getElementById('timeText').textContent = now.toLocaleTimeString();
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        const notepadButton = document.getElementById('notepadButton');
+        const notepadModal = document.getElementById('notepadModal');
+        const allNotesContainer = document.getElementById('allNotesContainer');
+        const closeNotepad = document.getElementById('closeNotepad');
+        const saveNotes = document.getElementById('saveNotes');
+
+        notepadButton.addEventListener('click', () => {
+            // Clear container
+            allNotesContainer.innerHTML = '';
+
+            // For each item, create a textarea to edit notes
+            tempOrderItems.forEach((item, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.flexDirection = 'column';
+                wrapper.style.gap = '3px';
+
+                const label = document.createElement('label');
+                label.textContent = `${item.name} (Qty: ${item.quantity})`;
+
+                const textarea = document.createElement('textarea');
+                textarea.value = item.notes || '';
+                textarea.dataset.index = index;
+                textarea.style.width = '100%';
+                textarea.style.minHeight = '50px';
+                textarea.style.resize = 'vertical';
+
+                wrapper.appendChild(label);
+                wrapper.appendChild(textarea);
+
+                allNotesContainer.appendChild(wrapper);
+            });
+
+            notepadModal.style.display = 'flex';
+        });
+
+        // CLOSE NOTEPAD
+        closeNotepad.addEventListener('click', () => {
+            notepadModal.style.display = 'none';
+        });
+
+        saveNotes.addEventListener('click', () => {
+            const textareas = allNotesContainer.querySelectorAll('textarea');
+
+            textareas.forEach(textarea => {
+                const idx = textarea.dataset.index;
+                const newNotes = textarea.value.trim();
+                tempOrderItems[idx].notes = newNotes;
+
+                // Update display in orderItems
+                const itemRow = tempOrderItems[idx].element;
+                const notesDiv = itemRow.querySelector('.item-notes');
+                if (notesDiv) {
+                    if (newNotes) {
+                        notesDiv.textContent = `Notes: ${newNotes}`;
+                    } else {
+                        notesDiv.remove();
+                    }
+                } else if (newNotes) {
+                    const div = document.createElement('div');
+                    div.className = 'item-notes';
+                    div.style.fontSize = '12px';
+                    div.style.color = '#555';
+                    div.textContent = `Notes: ${newNotes}`;
+                    itemRow.querySelector('div[style*="flex:1"]').appendChild(div);
+                }
+            });
+
+            notepadModal.style.display = 'none';
+        });
+
+        // ELEMENTS
+        const orderToggle = document.getElementById('orderToggle');
+        const sidebar = document.getElementById('sidebar');
+        const orderContainer = document.getElementById('orderContainer');
+        const menuToggle = document.getElementById('menuToggle');
+        const buttonsContainer = document.getElementById('buttonsContainer');
+        const searchContainer = document.getElementById('searchContainer');
+        const productDisplay = document.querySelector('.product-display');
+        const buttons = document.querySelectorAll('.dashboard-btn');
+        const topBarItems = document.querySelectorAll('.top-bar-item');
+        let tempOrderItems = [];
+
+        // SHIFT FUNCTION
+        function shiftUI(shiftSidebar, shiftOrder) {
+            if (shiftSidebar) {
+                buttonsContainer.classList.add('shifted-left');
+                searchContainer.classList.add('shifted-left');
+                topBarItems.forEach(el => el.classList.add('shifted-left-time'));
+            } else {
+                buttonsContainer.classList.remove('shifted-left');
+                searchContainer.classList.remove('shifted-left');
+                topBarItems.forEach(el => el.classList.remove('shifted-left-time'));
+            }
+
+            if (shiftOrder) {
+                buttonsContainer.classList.add('shifted-right');
+                searchContainer.classList.add('shifted-right');
+                productDisplay.classList.add('shifted-right');
+                topBarItems.forEach(el => el.classList.add('shifted-right-time'));
+            } else {
+                buttonsContainer.classList.remove('shifted-right');
+                searchContainer.classList.remove('shifted-right');
+                productDisplay.classList.remove('shifted-right');
+                topBarItems.forEach(el => el.classList.remove('shifted-right-time'));
+            }
+
+            if (shiftSidebar || shiftOrder) {
+                buttons.forEach(btn => btn.style.flex = '0 1 auto');
+            } else {
+                buttons.forEach(btn => btn.style.flex = '1');
+            }
+        }
+
+        // SIDEBAR TOGGLE
+        menuToggle.addEventListener('click', function() {
+            orderContainer.classList.remove("active"); 
+            orderToggle.textContent = "Open Order";
+            orderToggle.classList.remove("close-order");
+            orderToggle.classList.add("open-order");
+
+            sidebar.classList.toggle('active');
+            shiftUI(sidebar.classList.contains('active'), false);
+        });
+    
+        // ORDER TOGGLE
+        orderToggle.addEventListener('click', () => {
+            if (orderToggle.textContent === "Open Order") {
+                orderContainer.classList.add("active");
+                orderToggle.textContent = "Close Order";
+                orderToggle.classList.remove("open-order");
+                orderToggle.classList.add("close-order");
+
+                sidebar.classList.remove('active');
+                shiftUI(false, true);
+            } else {
+                orderContainer.classList.remove("active");
+                orderToggle.textContent = "Open Order";
+                orderToggle.classList.remove("close-order");
+                orderToggle.classList.add("open-order");
+
+                shiftUI(false, false);
+
+               
+        // ===== RESET DISPLAY SCREEN 1 =====
+        orderItems.innerHTML = "";  // clears all selected products
+
+        // ===== RESET TEMP JSON =====
+        tempOrderItems = [];
+
+        // ===== RESET SUBTOTAL =====
+        document.querySelector('.subtotal-amount').textContent = '$0.00';
+            }
+        });
+
+        // CLOSE SIDEBAR ON CLICK
+        sidebar.addEventListener('click', function () {
+            sidebar.classList.remove('active');
+            shiftUI(false, false);
+        });
+
+        // DROPDOWN FUNCTIONALITY
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.dropdown-btn').forEach(btn => {
+                if (!btn.dataset.defaultText) {
+                    btn.dataset.defaultText = btn.textContent.replace(' ▼','');
+                }
+
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const content = this.nextElementSibling;
+                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                });
+            });
+
+            function setupDropdownItems(dropdownItems) {
+                dropdownItems.forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const dropdownBtn = this.closest('.dropdown').querySelector('.dropdown-btn');
+                        dropdownBtn.textContent = this.textContent + ' ▼';
+                        dropdownBtn.dataset.selectedId = this.dataset.id;
+
+                        this.parentElement.querySelectorAll('.dot').forEach(dot => dot.style.background = 'transparent');
+                        this.querySelector('.dot').style.background = 'lightblue';
+                    });
+
+                    item.addEventListener('dblclick', function(e) {
+                        e.stopPropagation();
+                        const dropdownBtn = this.closest('.dropdown').querySelector('.dropdown-btn');
+                        dropdownBtn.textContent = dropdownBtn.dataset.defaultText + ' ▼';
+                        delete dropdownBtn.dataset.selectedId;
+                        this.querySelector('.dot').style.background = 'transparent';
+                    });
+                });
+            }
+
+            document.querySelectorAll('.dropdown-content').forEach(content => {
+                setupDropdownItems(content.querySelectorAll('.dropdown-item'));
+            });
+
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+            });
+        });
+
+        // EDITABLE ORDER TEXTS
+        document.addEventListener('DOMContentLoaded', function() {
+            const pencilBtn = document.getElementById('editPencil');
+            const customerName = document.getElementById('customerName');
+            const orderNumber = document.getElementById('orderNumber');
+
+            const defaultCustomerName = customerName.textContent;
+            const defaultOrderNumber = orderNumber.textContent;
+
+            let isEditing = false;
+
+            pencilBtn.addEventListener('click', function() {
+                if (!isEditing) {
+                    isEditing = true;
+                    customerName.contentEditable = "true";
+                    orderNumber.contentEditable = "true";
+                    customerName.style.borderBottom = "1px dashed #000";
+                    orderNumber.style.borderBottom = "1px dashed #000";
+                    customerName.focus();
+                } else {
+                    isEditing = false;
+                    customerName.contentEditable = "false";
+                    orderNumber.contentEditable = "false";
+                    customerName.style.borderBottom = "none";
+                    orderNumber.style.borderBottom = "none";
+
+                    if (customerName.textContent.trim() === "") customerName.textContent = defaultCustomerName;
+                    if (orderNumber.textContent.trim() === "") orderNumber.textContent = defaultOrderNumber;
+                }
+            });
+        });
+
+        const productCards = document.querySelectorAll('.product-card');
+        const productModal = document.getElementById('productModal');
+        const closeModal = document.getElementById('closeModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalCategory = document.getElementById('modalCategory');
+        const modalName = document.getElementById('modalName');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalPrice = document.getElementById('modalPrice');
+        const qtyCounter = document.getElementById('qtyCounter');
+        const decreaseQty = document.getElementById('decreaseQty');
+        const increaseQty = document.getElementById('increaseQty');
+        const selectBtn = document.getElementById('selectBtn');
+        const orderDetails = document.getElementById('orderDetails');
+        const orderItems = document.getElementById('orderItems'); // MUST EXIST IN HTML
+
+        let currentQty = 1;
+        let selectedProduct = null;
+
+        // ----------------------
+        // OPEN MODAL
+        // ----------------------
+        productCards.forEach(card => {
+                card.addEventListener('click', () => {
+                modalImage.src = card.querySelector('img').src;
+                modalName.textContent = card.dataset.name;
+                modalDescription.textContent = card.dataset.description;
+                modalPrice.textContent = `$${card.dataset.price}`;
+                modalCategory.textContent = card.dataset.category || "Uncategorized";
+
+                currentQty = 1;
+                qtyCounter.textContent = currentQty;
+                orderDetails.value = "";
+
+                selectedProduct = {
+                    name: card.dataset.name,
+                    price: Number(card.dataset.price),
+                    imageSrc: card.querySelector('img').src,
+                    category: card.dataset.category || "",
+                };
+
+                productModal.style.display = 'flex';
+            });
+        });
+
+        // ----------------------
+        // CLOSE MODAL
+        // ----------------------
+        closeModal.addEventListener('click', () => {
+            productModal.style.display = 'none';
+            selectedProduct = null;
+        });
+
+        // ----------------------
+        // QUANTITY CONTROLS
+        // ----------------------
+        increaseQty.addEventListener('click', () => {
+            currentQty++;
+            qtyCounter.textContent = currentQty;
+        });
+
+        decreaseQty.addEventListener('click', () => {
+            if (currentQty > 1) {
+                currentQty--;
+                qtyCounter.textContent = currentQty;
+            }
+        });
+
+        // ----------------------
+        // SELECT PRODUCT / ADD TO KART
+        // ----------------------
+        
+        selectBtn.addEventListener('click', () => {
+                if (!selectedProduct) return;
+
+                const totalPrice = (selectedProduct.price * currentQty).toFixed(2);
+                const notesText = orderDetails.value.trim(); // <-- grab textarea content
+
+                // CREATE DISPLAY ITEM IN ORDER LIST
+                const itemRow = document.createElement('div');
+                itemRow.style.display = 'flex';
+                itemRow.style.alignItems = 'center';
+                itemRow.style.gap = '10px';
+                itemRow.style.marginBottom = '8px';
+
+                itemRow.innerHTML = `
+                    <img src="${selectedProduct.imageSrc}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+                    <div style="flex:1;">
+                        <div style="font-weight:bold;">${selectedProduct.name}</div>
+                        <div style="color:green;">$${totalPrice}</div>
+                    </div>
+                    <div>Qty: ${currentQty}</div>
+                `;
+
+                orderItems.appendChild(itemRow);
+
+                // SAVE ITEM TO TEMP ORDER
+                tempOrderItems.push({
+                    name: selectedProduct.name,
+                    price: selectedProduct.price,
+                    quantity: currentQty,
+                    sub_total: selectedProduct.price * currentQty,
+                    imageSrc: selectedProduct.imageSrc,
+                    category: selectedProduct.category,
+                    notes: notesText,
+                    element: itemRow // allows editing later
+                });
+
+                // CLOSE MODAL
+                productModal.style.display = 'none';
+                selectedProduct = null;
+
+                // UPDATE TOTALS
+                updateSubtotal();
+                updateTaxDisplay();
+                updateTotal();
+            });
+
+        function updateSubtotal() {
+            const subtotalEl = document.querySelector('.billing-row span.amount'); // first .amount span
+            const subtotal = tempOrderItems.reduce((acc, item) => acc + item.sub_total, 0);
+            subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+        }
+
+        function calculateTax(subtotal) {
+                const taxRate = 0.1; // 10%
+                return subtotal * taxRate;
+        }
+
+        function updateTaxDisplay() {
+            const subtotal = tempOrderItems.reduce((acc, item) => acc + item.sub_total, 0);
+            const tax = calculateTax(subtotal);
+
+            // Ensure tax is always a number and formatted to 2 decimals
+            document.getElementById('taxAmount').textContent = `$${Number(tax.toFixed(2))}`;
+        }
+
+        // PROMO-CODE BUTTON FUNCTIONALITY
+        const promoBtn = document.querySelector('.pill-btn_order'); // assumes first button is Promo-code
+        const discountDisplay = document.getElementById('discountDisplay');
+
+        promoBtn.addEventListener('click', () => {
+            let discountPercent = prompt("Enter discount percentage (e.g., 10 for 10%)");
+            
+            if (discountPercent !== null) {
+                discountPercent = Number(discountPercent);
+                
+                if (isNaN(discountPercent) || discountPercent < 0 || discountPercent > 100) {
+                    alert("Please enter a valid number between 0 and 100");
+                    return;
+                }
+
+                // Show the discount percentage
+                discountDisplay.textContent = discountPercent + "%";
+
+                // Store discount for future use (optional)
+                tempOrderItems.discountPercent = discountPercent;
+            }
+        });
+
+        function updateTotal() {
+            const subtotal = tempOrderItems.reduce((acc, item) => acc + item.sub_total, 0);
+
+            const tax = calculateTax(subtotal);
+
+            const discountPercent = Number(tempOrderItems.discountPercent || 0);
+            const discountAmount = subtotal * (discountPercent / 100);
+
+            const total = subtotal + tax - discountAmount;
+
+            document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const placeOrderBtn = document.querySelector('.big-action-btn');
+            const orderNumberDiv = document.getElementById('orderNumber');
+            const customerNameDiv = document.getElementById('customerName');
+
+            // Function to fetch a new order number from the server
+            async function fetchNewOrderNumber() {
+                try {
+                    const res = await fetch('/get_next_order_number');
+                    const data = await res.json();
+                    if (data.order_number) {
+                        orderNumberDiv.textContent = data.order_number;
+                    } else {
+                        orderNumberDiv.textContent = '######';
+                        console.error(data.error);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    orderNumberDiv.textContent = '######';
+                }
+            }
+
+            // Initialize order number on page load
+            fetchNewOrderNumber();
+
+            placeOrderBtn.addEventListener('click', async () => {
+                // Grab dropdown buttons dynamically
+                const orderTypeBtn = document.querySelector('.dropdown-btn[data-default-text="Select Order Type"]');
+                const orderType = orderTypeBtn?.textContent.replace(' ▼','').trim();
+
+                const tableBtn = document.querySelector('.dropdown-btn[data-default-text="Select Table"]') 
+                                || document.querySelectorAll('.dropdown-btn')[0]; // fallback
+
+                const orderNumber = orderNumberDiv.textContent.trim();
+                const customerName = customerNameDiv.textContent.trim();
+                const tableId = tableBtn?.dataset.selectedId;
+
+                // Validation
+                if (!orderNumber || orderNumber === 'Order Number') {
+                    alert('Please enter Order Number');
+                    return;
+                }
+                if (!orderType) {
+                    alert('Please select Order Type');
+                    return;
+                }
+                if (!customerName || customerName === 'Customer Name') {
+                    alert('Please enter Customer Name');
+                    return;
+                }
+                if (!tableId) {
+                    alert('Please select a table');
+                    return;
+                }
+
+                // Grab notes
+                const order_description = tempOrderItems
+                    .filter(item => item.notes && item.notes.trim() !== "")
+                    .map(item => `${item.name}: ${item.notes}`)
+                    .join('\n');
+
+                // Grab order items
+                const orderItemsRows = Array.from(orderItems.children);
+                if (orderItemsRows.length === 0) {
+                    alert('No products selected!');
+                    return;
+                }
+
+                const orderItemsData = orderItemsRows.map(row => {
+                    let name = '';
+                    let price = 0;
+                    let quantity = 0;
+
+                    const divs = row.querySelectorAll('div');
+                    divs.forEach(div => {
+                        const rawText = div.textContent.trim();
+                        if (rawText.startsWith('$')) price = parseFloat(rawText.replace('$', '').trim());
+                        else if (rawText.includes('Qty:')) quantity = parseInt(rawText.replace('Qty:', '').trim(), 10);
+                        else if (!name) name = rawText.split('\n')[0].trim();
+                    });
+
+                    if (!name || isNaN(price) || isNaN(quantity)) return null;
+                    return { good_name: name, quantity: quantity, price_at_order: price };
+                }).filter(Boolean);
+
+                if (orderItemsData.length === 0) {
+                    alert('No valid items found!');
+                    return;
+                }
+
+                // ===== CALCULATE UNIQUE GOODS COUNT =====
+                const uniqueGoodsCount = new Set(tempOrderItems.map(item => item.name)).size;
+
+                try {
+                    // Send order to backend
+                    const response = await fetch('/place_order_table', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            order_number: orderNumber,
+                            order_type: orderType,
+                            customer_name: customerName,
+                            table_id: tableId,
+                            order_items: orderItemsData,
+                            order_desc: order_description,
+                            unique_goods_count: uniqueGoodsCount // ✅ NEW FIELD
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        alert(`Order placed successfully ✅\nOrder ID: ${data.order_id}`);
+
+                        // Reset UI
+                        orderItems.innerHTML = '';
+                        tempOrderItems = [];
+                        document.querySelector('.billing-row span.amount').textContent = '$0.00';
+                        document.getElementById('taxAmount').textContent = '$0.00';
+                        document.getElementById('totalAmount').textContent = '$0.00';
+
+                        // Fetch new order number
+                        await fetchNewOrderNumber();
+                    } else {
+                        alert('Failed to place order ❌: ' + data.error);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Server error ❌');
+                }
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const buttonsContainer = document.getElementById("buttonsContainer");
+
+            // Mapping of category names to icon filenames
+            const iconMap = {
+                "Bread": "bread_icon.png",
+                "Cake": "cake_icon.png",
+                "Donuts": "donut_icon.png",
+                "Pastries": "pastry_icon.png",
+                "Sandwich": "sandwich_icon.png"
+                // Add more if you add new categories
+            };
+
+            fetch("/get_product_categories")
+                .then(response => response.json())
+                .then(categories => {
+                    // Remove any existing dynamic buttons (keep ALL_Menu)
+                    const existingButtons = buttonsContainer.querySelectorAll(".dynamic-btn");
+                    existingButtons.forEach(btn => btn.remove());
+
+                    categories.forEach(category => {
+                        const btn = document.createElement("button");
+                        btn.classList.add("dashboard-btn", "dynamic-btn");
+
+                        // Store both fields in data attributes
+                        btn.dataset.categoryNumber = category.product_category_number;
+                        btn.dataset.categoryName = category.product_category_name;
+
+                        // Create icon img element
+                        const icon = document.createElement("img");
+                        icon.classList.add("btn-icon");
+                        const iconFile = iconMap[category.product_category_name] || "default_icon.png";
+                        icon.src = `/static/images/${iconFile}`;
+                        icon.alt = category.product_category_name;
+
+                        // Add icon and text to button
+                        btn.appendChild(icon);
+                        btn.insertAdjacentText("beforeend", " " + category.product_category_name);
+
+                        // Append to container
+                        buttonsContainer.appendChild(btn);
+
+                        // Optional: click handler
+                        btn.addEventListener("click", () => {
+                            console.log("Clicked category:", btn.dataset.categoryNumber, btn.dataset.categoryName);
+                            // Trigger product display logic here
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.error("Error fetching product categories:", err);
+                });
+        });
+
+       document.addEventListener("DOMContentLoaded", function() {
+            const buttonsContainer = document.getElementById("buttonsContainer");
+            const productCards = document.querySelectorAll(".product-card");
+
+            buttonsContainer.addEventListener("click", function(e) {
+                const btn = e.target.closest(".dashboard-btn");
+                if (!btn) return;
+
+                const category = btn.dataset.categoryName; // get category from button
+
+                productCards.forEach(card => {
+                    const cardCategory = card.dataset.category;
+                    // show all if category is "ALL", otherwise match category
+                    if (!category || category === "ALL" || cardCategory === category) {
+                        card.style.display = "block";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+            });
+        });
+
+      // Select the container
+      const trackOrdersContainer = document.querySelector('#trackDrawerContent .track-scroll');
+
+        async function fetchNewOrderNumber() {
+            try {
+                const res = await fetch('/get_new_order_number');
+                const data = await res.json();
+                orderNumberDiv.textContent = data.order_number;
+            } catch (err) {
+                console.error('Failed to fetch order number:', err);
+                orderNumberDiv.textContent = '######';
+            }
+        }
+
+        // Fetch a new order number on page load
+        fetchNewOrderNumber();
+
+
+    </script>
+
+</body>
+</html>

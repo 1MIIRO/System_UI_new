@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity - Tables</title>
+  
+<link rel="stylesheet" href="{{ url_for('static', filename='activity_Tables.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <div class="p-3">
+        <h5>{{ user.personal_name }}</h5>
+        <p>{{ user.job_desc }}</p>
+    </div>
+    <ul class="list-unstyled ps-3">
+        <li><a href="{{ url_for('dashboard') }}">Point_of_sales</a></li>
+        <li><a href="{{ url_for('activity_billing_queue') }}">Activity</a></li>
+        <li><a href="#">Inventory</a></li>
+        <li><a href="#">Teams</a></li>
+        <li><a href="#">Settings</a></li>
+    </ul>
+</div>
+
+<!-- ORDER PANEL -->
+<div id="orderContainer" class="order-container">
+    <!-- Top Title -->
+    <div class="order-top-bar">
+        <h1 class="order-panel-title">TABLE RESERVATIONS</h1>
+    </div>
+
+    <!-- BIG EMPTY DISPLAY SCREEN -->
+    <div id="orderDisplayScreen" class="order-display-screen">
+        
+    <!-- Reservations will be injected here by JS -->
+
+    </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar d-flex align-items-center">
+    <div id="menuToggle" class="menu-icon">&#9776;</div>
+
+    <div class="breadcrumb ms-3">
+        <span class="breadcrumb-main">Activity</span>
+        <span class="breadcrumb-sub"> / Tables</span>
+    </div>
+
+    <div class="ms-auto d-flex align-items-center gap-2 top-bar-items">
+        <div class="date-box">
+            <button class="icon-button">
+                <img src="{{ url_for('static', filename='images/calendar_icon.jpg') }}" class="icon-img">
+            </button>
+            <span id="dateText">--/--/----</span>
+        </div>
+
+        <div id="orderToggle" class="open-order top-bar-item">Open Order</div>
+    </div>
+</div>
+
+<!-- MAIN ACTIVITY CONTENT -->
+<div id="activityMain">
+    <div class="container-fluid mt-3">
+        <div class="row align-items-center">
+            <div class="col-3">
+                <input type="search" class="form-control rounded-input" placeholder="Search...">
+            </div>
+            <div class="col-9">
+                <input type="text" class="form-control rounded-input" placeholder="Add Tables">
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <div class="col-3">
+                <div class="vertical-container">
+                    <a href="{{ url_for('activity_billing_queue') }}">Billing Queue</a>
+                    <a href="{{ url_for('activity_Tables') }}" class="active">Tables</a>
+                    <a href="{{ url_for('activity_Order_history') }}">Order History</a>
+                </div>
+            </div>
+
+            <div class="col-9">
+                <div class="d-flex gap-3 mb-3">
+                    <button class="pill-btn" data-floor-btn="1st_floor">1st Floor</button>
+                    <button class="pill-btn" data-floor-btn="2nd_floor">2nd Floor</button>
+                    <button class="pill-btn" data-floor-btn="3rd_floor">3rd Floor</button>
+                    <button id="pencilToggle" class="btn btn-light btn-sm ms-auto">
+                        <img src="{{ url_for('static', filename='images/pencil_icon.jpg') }}" style="width:16px;">
+                    </button>
+                </div>
+                 
+                                <!-- ALERTS -->
+                {% if error_msg %}
+                <script>
+                    alert("Reservation Invalid: {{ error_msg }}");
+                </script>
+                {% elif request.method == 'POST' and not error_msg %}
+                <script>
+                    alert("Table reservation added successfully!");
+                </script>
+                {% endif %}
+
+                <div class="table-display">
+                    {% for floor, capacities in tables_by_floor.items() %}
+                    <div class="floor-section" data-floor="{{ floor }}" {% if floor != '1st_floor' %}style="display:none"{% endif %}>
+                        <div class="floor-label">{{ floor.replace('_',' ').title() }}</div>
+                        {% for capacity, tables in capacities.items() %}
+                        <div class="capacity-group">
+                            <div class="capacity-label">{{ capacity }} persons</div>
+                            <div class="floor-group d-flex flex-wrap gap-3">
+                                {% for table in tables %}
+                                <!-- TABLE CARD -->
+                                <div class="table-card {% if table['reserved'] %}reserved{% endif %}" id="card-{{ table['Table_db_id'] }}">
+                                    <!-- COLLAPSED HEADER -->
+                                    <div class="table-info" onclick="this.parentElement.classList.toggle('expanded')">
+                                        <p><strong>Table ID:</strong> {{ table['Table_db_id'] }}</p>
+                                        <p><strong>Table Number:</strong> {{ table['Table_number'] }}</p>
+                                        <p><strong>Capacity:</strong> {{ table['table_capacity'] }}</p>
+                                    </div>
+
+                                    <!-- EXPANDED FORM -->
+                                    <div class="reservation-form">
+                                        <p><strong>Table Floor:</strong> {{ floor_dict.get(table['Table_db_id'], 'No floor assigned') }}</p>
+                                        <form method="POST">
+                                            <input type="hidden" name="table_id" value="{{ table['Table_db_id'] }}">
+                                            <label>Number of People:</label>
+                                            <input type="number" name="number_of_people" required>
+                                            <label>Reservation Notes:</label>
+                                            <textarea name="reservation_notes" rows="2"></textarea>
+                                            <label>Customer Name:</label>
+                                            <input type="text" name="customer_name" required>
+                                            <label>Date Reserved:</label>
+                                            <input type="date" name="resservation_date" required>
+                                            <label>Time Reserved:</label>
+                                            <input type="time" name="reservation_time" required>
+                                            <label>Reservation Status:</label>
+                                            <select name="reservation_status" required>
+                                                {% for status in statuses %}
+                                                <option value="{{ status.reservation_status_id }}">{{ status.status_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <p><strong>Datetime Reservation Was Made:</strong> {{ datetime_now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                            <button type="submit">Save Reservation</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="table-status-legend">
+                    <span class="legend-title">Table Status</span>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <span class="status-dot available"></span>
+                            <span>Available</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="status-dot served"></span>
+                            <span>Served</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="status-dot reserved"></span>
+                            <span>Reserved</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPT -->
+<script>
+    function updateDateTime() {
+        const now = new Date();
+        document.getElementById('dateText').textContent = now.toLocaleDateString();
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const activityMain = document.getElementById('activityMain');
+    const topBarItems = document.querySelectorAll('.top-bar-items');
+    const orderToggle = document.getElementById('orderToggle');
+    const orderContainer = document.getElementById('orderContainer');
+
+        let shiftSidebar = false;
+        let shiftOrder = false;
+
+        function shiftUI() {
+            // SHIFT LEFT FOR SIDEBAR
+            if (shiftSidebar) {
+                activityMain.classList.add('shifted-left');
+                topBarItems.forEach(el => el.classList.add('shifted-left-time'));
+            } else {
+                activityMain.classList.remove('shifted-left');
+                topBarItems.forEach(el => el.classList.remove('shifted-left-time'));
+            }
+
+            // SHIFT RIGHT FOR ORDER PANEL
+            if (shiftOrder) {
+                activityMain.classList.add('shifted-right');
+                topBarItems.forEach(el => el.classList.add('shifted-right-time'));
+            } else {
+                activityMain.classList.remove('shifted-right');
+                topBarItems.forEach(el => el.classList.remove('shifted-right-time'));
+            }
+        }
+
+        // SIDEBAR TOGGLE
+        menuToggle.addEventListener('click', () => {
+            shiftSidebar = !shiftSidebar;
+            sidebar.classList.toggle('active');
+            shiftUI();
+        });
+
+        // ORDER PANEL TOGGLE
+        orderToggle.addEventListener('click', () => {
+            shiftOrder = !shiftOrder;
+
+            if (shiftOrder) {
+                orderContainer.classList.add("active");
+                orderToggle.textContent = "Close Order";
+                orderToggle.className = "close-order top-bar-item";
+
+                // Close sidebar when order panel opens
+                shiftSidebar = false;
+                sidebar.classList.remove('active');
+            } else {
+                orderContainer.classList.remove("active");
+                orderToggle.textContent = "Open Order";
+                orderToggle.className = "open-order top-bar-item";
+            }
+
+            shiftUI();
+        });
+
+        // ------------------------------
+        // Fetch all reservation statuses
+        // ------------------------------
+        async function fetchReservationStatuses() {
+            const response = await fetch('/get_reservation_statuses');
+            const statuses = await response.json(); // [{reservation_status_id, status_name}, ...]
+            const statusMap = {};
+            statuses.forEach(s => statusMap[s.reservation_status_id] = s.status_name);
+            return statusMap;
+        }
+
+        // ------------------------------
+        // Fetch all reservations
+        // ------------------------------
+        async function fetchReservations() {
+            const response = await fetch('/newUpdateTable_reservation_display');
+            const reservations = await response.json();
+
+            // Sort by nearest date/time
+            reservations.sort((a, b) => {
+                const dateA = new Date(a.resservation_date + ' ' + a.reservation_time);
+                const dateB = new Date(b.resservation_date + ' ' + b.reservation_time);
+                return dateA - dateB;
+            });
+
+            return reservations;
+        }
+
+            // ------------------------------
+            // Helpers
+            // ------------------------------
+            function isToday(dateString) {
+                const today = new Date().toISOString().split('T')[0];
+                return dateString === today;
+            }
+
+            // ------------------------------
+            // Create reservation card
+            // ------------------------------
+        function isToday(dateString) {
+            const today = new Date().toISOString().split('T')[0];
+            return dateString === today;
+        }
+
+        // ------------------------------
+        // Create reservation card
+        // ------------------------------
+       function createReservationCard(reservation, reservationStatuses) {
+    const card = document.createElement('div');
+    card.className = 'order-rectangle';
+
+    // Get the current status name
+    const currentStatusId = reservation.reservation_status_id;
+    const statusName = Object.entries(reservationStatuses)
+                             .find(([id, name]) => id == currentStatusId)[1].toLowerCase();
+
+    const isTodayReservation = isToday(reservation.resservation_date);
+
+    // Determine header class based on status and date
+    let headerClass = 'order-panel-card-header'; // default (yellow)
+    if (statusName === 'seated') {
+        headerClass += ' seated-header';  // red
+    } else if (statusName === 'completed') {
+        headerClass += ' completed-header'; // green
+    } else if (isTodayReservation) {
+        headerClass += ' today-header'; // purple
+    }
+
+    // Build card HTML
+    card.innerHTML = `
+        <div class="${headerClass}" id="card-header-${reservation.reservation_id}">
+            #${reservation.reservation_id}.${reservation.user_id}.${reservation.customer_name}
+        </div>
+
+        <div class="order-panel-card-body-text">
+            <div>.Table               : ${reservation.Table_number || 'N/A'}</div>
+            <div>.floor               : ${reservation.floor_name || 'N/A'}</div>
+            <div>.entered_by          : ${reservation.entered_by || 'N/A'}</div>
+            <div>.number of people    : ${reservation.number_of_people || 'N/A'}</div>
+            <div>.SPECIFICATIONS      : ${reservation.reservation_notes || ''}</div>
+            <div>.Reservation/date    : ${reservation.resservation_date}</div>
+            <div>.Reservation/Time    : ${reservation.reservation_time}</div>
+            <div>.date completed      : ${reservation.Datetime_reservation_was_made}</div>
+        </div>
+
+        <div class="order-panel-reservation-select-list">
+            .Reservation status :
+            <select class="reservation-status">
+                ${Object.entries(reservationStatuses).map(([id, name]) => `
+                    <option value="${id}" ${currentStatusId == id ? 'selected' : ''}>
+                        ${name}
+                    </option>
+                `).join('')}
+            </select>
+        </div>
+
+        <button class="rect-save-btn">Save Changes</button>
+    `;
+
+    // UX: disable non-today reservations
+    const select = card.querySelector('.reservation-status');
+    const saveBtn = card.querySelector('.rect-save-btn');
+
+    if (!isTodayReservation) {
+        select.disabled = true;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Locked (Not Today)';
+    }
+
+    // Save status change
+    saveBtn.addEventListener('click', async () => {
+        const selectedStatus = select.value;
+
+        try {
+            const res = await fetch('/update_reservation_status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    reservation_id: reservation.reservation_id,
+                    reservation_status_id: selectedStatus
+                })
+            });
+
+            if (res.ok) {
+                alert('Reservation status updated!');
+                // Refresh cards to apply new color logic
+                renderReservations();
+            } else {
+                alert('Failed to update reservation status.');
+            }
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+    });
+
+    return card;
+}
+
+
+        // ------------------------------
+        // Render reservations (NO duplicates)
+        // ------------------------------
+        async function renderReservations() {
+            const container = document.getElementById('orderDisplayScreen');
+            container.innerHTML = '';
+
+            try {
+                const [reservationStatuses, reservations] = await Promise.all([
+                    fetchReservationStatuses(),
+                    fetchReservations()
+                ]);
+
+                console.log('Reservations fetched:', reservations.length);
+
+                const seenIds = new Set();
+
+                reservations.forEach(res => {
+                    if (!seenIds.has(res.reservation_id)) {
+                        container.appendChild(
+                            createReservationCard(res, reservationStatuses)
+                        );
+                        seenIds.add(res.reservation_id);
+                    }
+                });
+
+            } catch (err) {
+                console.error('Error rendering reservations:', err);
+            }
+        }
+
+        // ------------------------------
+        // Load once safely
+        // ------------------------------
+        if (!window.reservationsRendered) {
+            document.addEventListener('DOMContentLoaded', () => {
+                renderReservations();
+                window.reservationsRendered = true;
+            });
+        }
+
+
+         document.addEventListener('DOMContentLoaded', () => {
+                const floorButtons = document.querySelectorAll('.pill-btn');
+                const floorSections = document.querySelectorAll('.floor-section');
+
+                floorButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const selectedFloor = btn.dataset.floorBtn;
+                        floorSections.forEach(section => section.style.display = 'none');
+                        const floorToShow = document.querySelector(`.floor-section[data-floor="${selectedFloor}"]`);
+                        if(floorToShow) floorToShow.style.display = 'block';
+                    });
+                });
+            });
+</script>
+
+</body>
+</html>

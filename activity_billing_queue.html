@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity - Billing Queue</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='activity_billing_queue.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="sidebar">
+        <div class="p-3">
+            <h5>{{ user.personal_name }}</h5>
+            <p>{{ user.job_desc }}</p>
+        </div>
+        <ul class="list-unstyled ps-3">
+            <li><a href="{{ url_for('dashboard') }}">Point_of_sales</a></li>
+            <li><a href="{{ url_for('activity_billing_queue') }}">Activity</a></li>
+            <li><a href="#">Inventory</a></li>
+            <li><a href="#">Teams</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </div>
+
+   <!-- ORDER PANEL -->
+   <div id="orderContainer" class="order-container">
+        <!-- Top Title -->
+        <div class="order-top-bar">
+            <h1 class="order-panel-title">Order Billing Queue</h1>
+        </div>
+
+        <!-- Display screen for expandable cards -->
+        <div class="billing-panel-cards-display">
+            <div class="billing-panel-cards-wrapper">
+                <div id="order-rectangle-screen" class="rectangle-cards-wrapper">
+                     <!-- Rectangular order cards will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="top-bar d-flex align-items-center">
+        <div id="menuToggle" class="menu-icon">&#9776;</div>
+
+        <div class="breadcrumb ms-3">
+            <span class="breadcrumb-main">Activity</span>
+            <span class="breadcrumb-sub"> / Billing Queue</span>
+        </div>
+
+        <div class="ms-auto d-flex align-items-center gap-2 top-bar-item">
+            <div class="date-box d-flex align-items-center gap-1">
+                <button class="icon-button">
+                    <img src="{{ url_for('static', filename='images/calendar_icon.jpg') }}" class="icon-img">
+                </button>
+                <span id="dateText">--/--/----</span>
+            </div>
+
+            <div id="orderToggle" class="open-order top-bar-item">Open Order</div>
+        </div>
+    </div>
+
+    <!-- MAIN ACTIVITY CONTENT -->
+    <div id="activityMain">
+
+        <div class="container-fluid mt-3">
+            <div class="row align-items-center">
+                <div class="col-3">
+                    <input id="search_activity" type="search"
+                        class="form-control rounded-input"
+                        placeholder="Search...">
+                </div>
+            
+            <div class="col-9 d-flex gap-3 pill-wrapper">
+                    <button class="pill-btn">ALL</button>
+                    <button class="pill-btn">ACTIVE</button>
+                    <button class="pill-btn">CLOSED</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="container-fluid mt-3">
+            <div class="row">
+                <div class="col-3">
+                    <div class="vertical-container">
+                        <a href="{{ url_for('activity_billing_queue') }}" class="active">Billing Queue</a>
+                        <a href="{{ url_for('activity_Tables') }}">Tables</a>
+                        <a href="{{ url_for('activity_Order_history') }}">Order History</a>
+                    </div>
+                </div>
+                <div class="col-9 d-flex flex-column gap-3">
+
+    <!-- Display screen -->
+                <div class="activity-display-screen">
+                    <p class="activity-display-text">
+                        Billing queue items will appear here…
+                    </p>
+                </div>
+
+                <!-- Order cards (permanent) -->
+                <div id="orderCardsContent" class="order-cards-grid">
+                    <!-- Order cards will be appended here -->
+                </div>
+
+            </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        const orderToggle = document.getElementById('orderToggle');
+        const sidebar = document.getElementById('sidebar');
+        const orderContainer = document.getElementById('orderContainer');
+        const menuToggle = document.getElementById('menuToggle');
+        const activityMain = document.getElementById('activityMain');
+        const topBarItems = document.querySelectorAll('.top-bar-item');
+
+        function shiftUI(shiftSidebar, shiftOrder) {
+            if (shiftSidebar) {
+                activityMain.classList.add('shifted-left');
+                topBarItems.forEach(el => el.classList.add('shifted-left-time'));
+            } else {
+                activityMain.classList.remove('shifted-left');
+                topBarItems.forEach(el => el.classList.remove('shifted-left-time'));
+            }
+
+            if (shiftOrder) {
+                activityMain.classList.add('shifted-right');
+                topBarItems.forEach(el => el.classList.add('shifted-right-time'));
+            } else {
+                activityMain.classList.remove('shifted-right');
+                topBarItems.forEach(el => el.classList.remove('shifted-right-time'));
+            }
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('dateText').textContent = now.toLocaleDateString();
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        menuToggle.addEventListener('click', () => {
+            orderContainer.classList.remove("active");
+            orderToggle.textContent = "Open Order";
+            orderToggle.className = "open-order top-bar-item";
+
+            sidebar.classList.toggle('active');
+            shiftUI(sidebar.classList.contains('active'), false);
+        });
+
+        orderToggle.addEventListener('click', () => {
+            if (orderToggle.textContent === "Open Order") {
+                orderContainer.classList.add("active");
+                orderToggle.textContent = "Close Order";
+                orderToggle.className = "close-order top-bar-item";
+
+                sidebar.classList.remove('active');
+                shiftUI(false, true);
+            } else {
+                orderContainer.classList.remove("active");
+                orderToggle.textContent = "Open Order";
+                orderToggle.className = "open-order top-bar-item";
+
+                shiftUI(false, false);
+            }
+        });
+
+        // Clicking sidebar closes it
+        sidebar.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            shiftUI(false, orderContainer.classList.contains('active'));
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Initialize all dropdown buttons
+            document.querySelectorAll('.dropdown-btn').forEach(btn => {
+                // Store the default text if not already stored
+                if (!btn.dataset.defaultText) {
+                    btn.dataset.defaultText = btn.textContent.replace(' ▼','');
+                }
+
+                // Toggle dropdown display
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const content = this.nextElementSibling;
+                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                });
+            });
+
+            // Function to handle selection/unselection
+            function setupDropdownItems(dropdownItems) {
+                dropdownItems.forEach(item => {
+                    // Single click = select
+                    item.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const dropdownBtn = this.closest('.dropdown').querySelector('.dropdown-btn');
+                        
+                        // Update button text
+                        dropdownBtn.textContent = this.textContent + ' ▼';
+                        dropdownBtn.dataset.selectedId = this.dataset.id;
+
+                        // Remove highlight from all dots in this dropdown
+                        this.parentElement.querySelectorAll('.dot').forEach(dot => dot.style.background = 'transparent');
+
+                        // Highlight the dot for this selection
+                        this.querySelector('.dot').style.background = 'lightblue';
+
+                        console.log('Selected ID:', this.dataset.id);
+                        // Dropdown stays open
+                    });
+
+                    // Double click = unselect
+                    item.addEventListener('dblclick', function(e) {
+                        e.stopPropagation();
+                        const dropdownBtn = this.closest('.dropdown').querySelector('.dropdown-btn');
+
+                        // Reset button text and selected ID
+                        dropdownBtn.textContent = dropdownBtn.dataset.defaultText + ' ▼';
+                        delete dropdownBtn.dataset.selectedId;
+
+                        // Reset dot
+                        this.querySelector('.dot').style.background = 'transparent';
+
+                        console.log('Option unselected');
+                    });
+                });
+            }
+
+            // Apply to all dropdown items
+            document.querySelectorAll('.dropdown-content').forEach(content => {
+                setupDropdownItems(content.querySelectorAll('.dropdown-item'));
+            });
+
+            // Close any dropdown if clicked outside
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+            });
+
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const pencilBtn = document.getElementById('editPencil');
+            const customerName = document.getElementById('customerName');
+            const orderNumber = document.getElementById('orderNumber');
+
+            // Store original/default values
+            const defaultCustomerName = customerName.textContent;
+            const defaultOrderNumber = orderNumber.textContent;
+
+            let isEditing = false; // Track edit mode
+
+            pencilBtn.addEventListener('click', function() {
+                if (!isEditing) {
+                    // Enter edit mode
+                    isEditing = true;
+                    customerName.contentEditable = "true";
+                    orderNumber.contentEditable = "true";
+
+                    // Optional: highlight editable fields
+                    customerName.style.borderBottom = "1px dashed #000";
+                    orderNumber.style.borderBottom = "1px dashed #000";
+
+                    customerName.focus(); // focus first field
+                } else {
+                    // Save or reset changes
+                    isEditing = false;
+                    customerName.contentEditable = "false";
+                    orderNumber.contentEditable = "false";
+
+                    // Remove highlight
+                    customerName.style.borderBottom = "none";
+                    orderNumber.style.borderBottom = "none";
+
+                    // If fields are empty, reset to defaults
+                    if (customerName.textContent.trim() === "") customerName.textContent = defaultCustomerName;
+                    if (orderNumber.textContent.trim() === "") orderNumber.textContent = defaultOrderNumber;
+
+                    console.log("Saved Customer Name:", customerName.textContent);
+                    console.log("Saved Order Number:", orderNumber.textContent);
+                }
+            });
+        });
+    
+       document.addEventListener('DOMContentLoaded', () => {
+
+            const content = document.getElementById('orderCardsContent');
+
+            async function fetchOrderCards() {
+                try {
+                    const res = await fetch('/order_display_cards');
+                    const orders = await res.json();
+
+                    content.innerHTML = '';
+
+                    orders.forEach(order => {
+
+                        /* ===============================
+                        STATUS MAPPING (PER ORDER)
+                        =============================== */
+                        let statusText = 'Unknown';
+                        let statusClass = 'status-default';
+
+                        switch ((order.order_status || '').toLowerCase()) {
+                            case 'pending':
+                                statusText = 'Loading';
+                                statusClass = 'status-loading';
+                                break;
+
+                            case 'in_progress':
+                                statusText = 'On kitchen hand';
+                                statusClass = 'status-kitchen';
+                                break;
+
+                            case 'complete':
+                                statusText = 'Complete';
+                                statusClass = 'status-complete';
+                                break;
+
+                            case 'cancelled':
+                                statusText = 'Cancelled';
+                                statusClass = 'status-cancelled';
+                                break;
+                        }
+
+                        /* ===============================
+                        CARD
+                        =============================== */
+                        const card = document.createElement('div');
+                        card.className = 'order-card';
+
+                        /* ===============================
+                        HEADER
+                        =============================== */
+                        const header = document.createElement('div');
+                        header.className = 'order-header';
+
+                        header.innerHTML = `
+                            <strong>${order.customer_name}</strong>
+
+                            <span class="status-pill ${statusClass}">
+                                ${statusText}
+                            </span>
+
+                            <div>${order.table_number} · ${order.category}</div>
+                            <div>${order.time}</div>
+
+                            <div class="status-time">
+                                🕒 ${order.order_status_time || ''}
+                            </div>
+                        `;
+
+                        card.appendChild(header);
+
+                        /* ===============================
+                        ITEMS
+                        =============================== */
+                        const itemsContainer = document.createElement('div');
+                        itemsContainer.className = 'items-container';
+
+                        (order.items || []).forEach((item, idx) => {
+                            const row = document.createElement('div');
+                            row.className = 'item-row';
+                            row.textContent = `${item.quantity} × ${item.good_name}`;
+
+                            if (idx >= 3) row.style.display = 'none';
+                            itemsContainer.appendChild(row);
+                        });
+
+                        /* ===============================
+                        SEE MORE / LESS
+                        =============================== */
+                        if ((order.items || []).length > 3) {
+                            const seeMoreBtn = document.createElement('button');
+                            seeMoreBtn.className = 'see-more-btn';
+                            seeMoreBtn.textContent = 'See More';
+
+                            let expanded = false;
+                            seeMoreBtn.onclick = () => {
+                                expanded = !expanded;
+
+                                Array.from(itemsContainer.children).forEach((child, idx) => {
+                                    if (idx >= 3 && !child.classList.contains('see-more-btn')) {
+                                        child.style.display = expanded ? 'block' : 'none';
+                                    }
+                                });
+
+                                seeMoreBtn.textContent = expanded ? 'See Less' : 'See More';
+                            };
+
+                            itemsContainer.appendChild(seeMoreBtn);
+                        }
+
+                        card.appendChild(itemsContainer);
+
+                        /* ===============================
+                        FOOTER
+                        =============================== */
+                        const footer = document.createElement('div');
+                        footer.className = 'order-footer';
+                        footer.innerHTML = `
+                            <span>Total Items</span>
+                            <span>${order.items_count}</span>
+                        `;
+
+                        card.appendChild(footer);
+                        content.appendChild(card);
+                    });
+
+                } catch (err) {
+                    console.error(err);
+                    content.innerHTML = '<div style="color:red">Failed to load</div>';
+                }
+            }
+
+            fetchOrderCards();
+            setInterval(fetchOrderCards, 10000);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('order-rectangle-screen');
+
+        // GLOBAL STATE to persist between reloads
+        let expandedOrders = new Set();              // Tracks expanded rectangles
+        let selectedStatus = new Map();              // Tracks selected status per order ID
+
+        async function loadTodayOrders() {
+            try {
+                // Fetch today's orders
+                const resOrders = await fetch('/get_today_orders_display');
+                const orders = await resOrders.json();
+
+                // Fetch all possible order statuses
+                const resStatuses = await fetch('/get_all_order_status');
+                const allStatuses = await resStatuses.json(); // [{order_status_id: 1, order_status: "Pending"}, ...]
+
+                // Before clearing container, record expanded and selected status states
+                container.querySelectorAll('.order-rectangle').forEach(rect => {
+                    const orderId = rect.dataset.orderId;
+                    const extraContent = rect.querySelector('.rect-extra');
+                    const collapseBtn = rect.querySelector('.rect-collapse-btn');
+                    const dropdownBtn = rect.querySelector('.dropdown-btn');
+
+                    if (rect.classList.contains('expanded')) {
+                        expandedOrders.add(orderId);
+                    } else {
+                        expandedOrders.delete(orderId);
+                    }
+
+                    if (dropdownBtn) {
+                        selectedStatus.set(orderId, dropdownBtn.textContent.replace(' ▼', ''));
+                    }
+                });
+
+                // Clear container
+                container.innerHTML = '';
+
+                // Render rectangles
+                orders.forEach(order => {
+                    const rect = document.createElement('div');
+                    rect.className = 'order-rectangle collapsed';
+                    rect.dataset.orderId = order.order_identification_number;
+
+                    rect.innerHTML = `
+                        <div class="rect-line-1"><b>${order.order_identification_number}</b></div>
+                        <div class="rect-line-2"><b>${order.customer_name}</b></div>
+                        <div class="rect-line-3"><b>${order.TIME}</b></div>
+
+                        <div class="rect-extra">
+                            <div><b>Items: ${order.items_count || 0}</b></div>
+                            <div><b>Total: ${order.Total_ammount || 0}</b></div>
+                            <div><b>Category: ${order.order_categories_name || ""}</b></div>
+
+                            <!-- STATUS DROPDOWN -->
+                            <div class="status-dropdown" style="position: relative;">
+                                <button class="dropdown-btn">${selectedStatus.get(order.order_identification_number) || order.order_status} ▼</button>
+                                <div class="dropdown-content" style="display:none; border: 1px solid #ccc; background: #fff; position: absolute; z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                            </div>
+
+                            <div class="status-update"><b>Status Update: ${order.order_state_last_update || ""}</b></div>
+                            <div class="order-update"><b>Order Update: ${order.order_last_update || ""}</b></div>
+
+
+                            <button class="rect-save-btn"><b>Save</b></button>
+                            <button class="rect-collapse-btn"><b>Collapse</b></button>
+                        </div>
+                    `;
+                      
+                    const extraContent = rect.querySelector('.rect-extra');
+                    const collapseBtn = rect.querySelector('.rect-collapse-btn');
+                    const dropdownBtn = rect.querySelector('.dropdown-btn');
+                    const dropdownContent = rect.querySelector('.dropdown-content');
+
+                    
+                                        // Save button logic
+                    const saveBtn = rect.querySelector('.rect-save-btn');
+                    saveBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+
+                        const currentStatus = selectedStatus.get(order.order_identification_number) || order.order_status;
+
+                        // If no change, do nothing
+                        if (currentStatus === order.order_status) return;
+
+                        // Find the order_status_id for the selected status
+                        const statusObj = allStatuses.find(s => s.order_status === currentStatus);
+                        if (!statusObj) {
+                            console.error('Selected status not found in status list');
+                            return;
+                        }
+
+                        try {
+                            // Send POST request to Flask
+                            const res = await fetch('/update_order_status', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    order_identification_number: order.order_identification_number,
+                                    order_status_id: statusObj.order_status_id
+                                })
+                            });
+
+                            const result = await res.json();
+
+                            if (result.success) {
+                                // Update local order status
+                                order.order_status = currentStatus;
+
+                                // Update Status Update div
+                                const statusUpdateElem = extraContent.querySelector('.status-update');
+                                if (statusUpdateElem) {
+                                    statusUpdateElem.innerHTML = `<b>Status Update: ${new Date().toLocaleString()}</b>`;
+                                }
+
+                                // Update Order Update div
+                                const orderUpdateElem = extraContent.querySelector('.order-update');
+                                if (orderUpdateElem) {
+                                    orderUpdateElem.innerHTML = `<b>Order Update: ${new Date().toLocaleString()}</b>`;
+                                }
+
+                                console.log('Order status updated successfully');
+                            } else {
+                                console.error('Failed to update order status:', result.message);
+                            }
+                        } catch (err) {
+                            console.error('Error updating order status:', err);
+                        }
+                    });
+
+
+                                    // Populate dropdown
+                    allStatuses.forEach(statusObj => {
+                        const item = document.createElement('div');
+                        item.className = 'dropdown-item';
+                        item.textContent = statusObj.order_status;
+                        item.style.padding = '5px 10px';
+                        item.style.cursor = 'pointer';
+                        item.style.display = 'flex';
+                        item.style.alignItems = 'center';
+                        item.style.gap = '8px';
+
+                        const dot = document.createElement('span');
+                        dot.className = 'dot';
+                        dot.style.width = '8px';
+                        dot.style.height = '8px';
+                        dot.style.borderRadius = '50%';
+                        dot.style.display = 'inline-block';
+                        
+                        // Highlight the dot if this status matches the selected one
+                        const currentStatus = selectedStatus.get(order.order_identification_number) || order.order_status;
+                        dot.style.background = statusObj.order_status === currentStatus ? 'lightblue' : 'transparent';
+
+                        item.prepend(dot);
+
+                        // Click to select
+                        item.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            dropdownBtn.textContent = statusObj.order_status + ' ▼';
+                            selectedStatus.set(order.order_identification_number, statusObj.order_status);
+
+                            dropdownContent.querySelectorAll('.dot').forEach(d => d.style.background = 'transparent');
+                            dot.style.background = 'lightblue';
+                            dropdownContent.style.display = 'none';
+                        });
+
+                        dropdownContent.appendChild(item);
+                    });
+
+                    // Toggle dropdown
+                    dropdownBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+                    });
+
+                    // Hide extra content by default
+                    extraContent.style.display = 'none';
+                    collapseBtn.style.display = 'none';
+
+                    // Restore expanded state
+                    if (expandedOrders.has(order.order_identification_number)) {
+                        rect.classList.add('expanded');
+                        rect.classList.remove('collapsed');
+                        extraContent.style.display = 'block';
+                        collapseBtn.style.display = 'block';
+                    }
+
+                    // Expand rectangle on click (outside dropdown)
+                    rect.addEventListener('click', (e) => {
+                        if (!e.target.closest('.status-dropdown')) {
+                            if (!rect.classList.contains('expanded')) {
+                                rect.classList.add('expanded');
+                                rect.classList.remove('collapsed');
+                                extraContent.style.display = 'block';
+                                collapseBtn.style.display = 'block';
+                                expandedOrders.add(order.order_identification_number);
+                            }
+                        }
+                    });
+
+                    // Collapse button
+                    collapseBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        rect.classList.remove('expanded');
+                        rect.classList.add('collapsed');
+                        extraContent.style.display = 'none';
+                        collapseBtn.style.display = 'none';
+                        expandedOrders.delete(order.order_identification_number);
+                    });
+
+                    container.appendChild(rect);
+                });
+
+                // Close dropdowns when clicking outside
+                document.addEventListener('click', (e) => {
+                    container.querySelectorAll('.dropdown-content').forEach(dc => {
+                        if (!dc.parentElement.contains(e.target)) {
+                            dc.style.display = 'none';
+                        }
+                    });
+                });
+
+            } catch (err) {
+                console.error('Failed to load today orders:', err);
+                container.innerHTML = '<div style="color:red;"><b>Failed to load orders</b></div>';
+            }
+        }
+
+        // Initial load
+        loadTodayOrders();
+
+        // Refresh every 10s
+        setInterval(loadTodayOrders, 10000); // rectangles will now keep expand/collapse & dropdown states
+    });
+
+                // Save button logic inside loadTodayOrders() after creating rect and dropdown
+      
+        document.addEventListener('DOMContentLoaded', () => {
+            const screen = document.querySelector('.activity-display-screen');
+
+            async function loadBillingQueue() {
+                try {
+                    const res = await fetch('/billing_queue_display');
+                    const orders = await res.json();
+
+                    screen.innerHTML = '';
+
+                    orders.forEach(order => {
+                        const row = document.createElement('div');
+                        row.className = 'queue-row';
+
+                        row.innerHTML = `
+                            <div class="queue-top">
+                                <span class="customer-name">${order.customer_name}</span>
+                                <span class="amount">($) ${order.Total_ammount}</span>
+                            </div>
+
+                            <div class="queue-middle">
+                                <div>Order Number : ${order.order_identification_number}</div>
+                                <div>Table        : ${order.Table_number || '-'}</div>
+                            </div>
+
+                            <div class="queue-bottom">
+                                <span class="order-date">${order.DATE}</span>
+                                <span class="status-pill ${order.pill_class}">
+                                    ${order.pill_text}
+                                </span>
+                            </div>
+
+                            <hr class="queue-divider">
+                        `;
+
+                        screen.appendChild(row);
+                    });
+
+                } catch (err) {
+                    console.error(err);
+                    screen.innerHTML = '<p style="color:red">Failed to load billing queue</p>';
+                }
+            }
+
+            loadBillingQueue();
+            setInterval(loadBillingQueue, 10000);
+        });
+
+
+</script>
+
+</body>
+</html>

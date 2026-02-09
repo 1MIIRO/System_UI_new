@@ -1,0 +1,567 @@
+body {
+    margin: 0;
+    background: #f5f5f5;
+    overflow-x: hidden;
+}
+
+/* SIDEBAR */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #222;
+    overflow-x: hidden;
+    padding-top: 20px;
+    transition: 0.3s;
+    color: white;
+}
+
+.sidebar.active {
+    width: 170px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px 0;
+    color: #ddd;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    color: white;
+}
+
+/* TOP BAR */
+.top-bar {
+    width: 100%;
+    background: #edeff0;
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+}
+
+.menu-icon {
+    font-size: 26px;
+    cursor: pointer;
+    color: blue;  /* Make hamburger icon blue */
+}
+
+/* ORDER BUTTON */
+.close-order { color: red; cursor: pointer; }
+.open-order { color: green; cursor: pointer; }
+
+/* BUTTON CONTAINER */
+.buttons-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    transition: margin-left 0.3s, margin-right 0.3s;
+    padding: 0;
+}
+
+.buttons-container.shifted {
+    margin-left: 170px; /* exactly the sidebar width */
+}
+
+/* NEW BUTTONS SHIFT CLASSES */
+.buttons-shift-left {
+    margin-left: 220px; /* custom shift when sidebar opens */
+    transition: margin 0.3s ease;
+}
+
+.buttons-shift-right {
+    margin-right: 320px; /* custom shift when order panel opens */
+    transition: margin 0.3s ease;
+}
+
+/* DASHBOARD BUTTONS */
+.dashboard-btn {
+    background: white;
+    border: 1px solid #000;
+    padding: 15px;
+    border-radius: 8px;
+    flex: 1;
+    text-align: center;
+    margin: 0 5px;
+    font-weight: 600;
+}
+
+.btn-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.dashboard-btn:hover {
+    border-color: blue;
+}
+
+/* RIGHT ORDER PANEL */
+.order-container {
+    width: 25%;
+    min-width: 250px;
+    background: white;
+    color: black;
+    height: 100%;
+    position: fixed;
+    right: -25%;
+    top: 0;
+    transition: 0.4s;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+}
+
+.order-container.active {
+    right: 0;
+    pointer-events: auto;
+}
+
+/* ORDER TOP BAR */
+.order-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* buttons left & right */
+    border-bottom: 1px solid #ccc;
+    padding: 5px 10px;
+    position: relative; /* needed for absolute centering of middle */
+}
+
+/* Middle editable texts */
+.order-top-bar .order-texts {
+    position: absolute;  /* center independently of buttons */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* perfectly center horizontally & vertically */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Customer Name */
+.order-top-bar .order-texts #customerName {
+    font-weight: bold;
+    color: #050505;
+    font-size: 18px;
+}
+
+/* Order Number */
+.order-top-bar .order-texts #orderNumber {
+    font-weight: 400;
+    color: #6c757d;
+    font-size: 10px;
+}
+
+/* DROPDOWNS */
+.order-dropdowns {
+    display: flex;
+    gap: 5px;
+}
+.order-dropdowns .dropdown { flex: 1; }
+.dropdown-btn {
+    width: 100%;
+    padding: 8px;
+    background: #5178c5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+}
+.dropdown-content {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+    padding: 5px;
+}
+
+.dropdown-btn_ordertype {
+    width: 100%;
+    padding: 8px;
+    background: #5178c5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+}
+.dropdown-content_order_type {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+    padding: 5px;
+}
+
+
+/* Parent container uses flex column */
+.order-display-screens {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* space between screens */
+    height: calc(100% - 150px); /* optional: give total height minus space for buttons */
+}
+
+/* Display Screen 1: larger */
+.display-screen-1 {
+    flex: 3.24;          /* increased from 2.4 → bigger portion */
+    min-height: 300px; 
+    overflow-y: auto;
+}
+
+/* Display Screen 2: smaller, pushed down */
+.display-screen-2 {
+    flex: 1.5;          /* decreased from 1.2 → smaller portion */
+    min-height: 100px; 
+}
+
+/* Custom scrollbar for Webkit browsers (Chrome, Edge, Safari) */
+.display-screen-1::-webkit-scrollbar {
+    width: 8px;
+}
+
+.display-screen-1::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 4px;
+}
+
+.display-screen-1::-webkit-scrollbar-thumb {
+    background-color: #4da6ff; /* light blue */
+    border-radius: 4px;
+    border: 2px solid #f1f1f1; /* adds spacing around thumb */
+}
+
+.billing-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: monospace;   /* 🔑 ensures even spacing */
+}
+
+/* Receipt rows */
+.billing-row {
+    display: grid;
+    grid-template-columns: 1fr 120px; /* forces space before $ */
+    align-items: center;
+}
+
+/* Dollar column */
+.billing-row .amount {
+    text-align: left; /* space remains after $ */
+}
+
+/* Dotted separator */
+.billing-separator {
+    width: 100%;
+    border-top: 2px dotted #000;
+    margin: 6px 0;
+}
+
+/* TOTAL emphasis */
+.billing-row.total {
+    font-weight: bold;
+}
+
+.order-button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: auto; /* pushes buttons to bottom of the container */
+}
+
+/* Pill buttons - top row */
+.pill-btn_order {
+    box-sizing: border-box; /* includes padding & border in width */
+    width: calc(50% - 2px); /* split evenly minus small margin */
+    padding: 6px 0;  
+    border-radius: 999px;
+    border: 1px solid #00025d;
+    background: #f8f9fa;
+    font-size: 13px;
+    cursor: pointer;
+    color:#1a2228
+}
+.pill-btn_order:hover { border-color: #165030; color: #165030; }
+
+.pill-btn_order:first-child {
+    margin-right: 4px;
+}
+
+.pill-btn_order:last-child {
+    margin-left: 4px;
+}
+
+.button-bottom {
+    width: 100%;
+}
+
+/* BIG BUTTON */
+.big-action-btn {
+    box-sizing: border-box; /* include padding & border in width */
+    width: 100%;
+    padding: 8px 0;
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.search-container {
+    transition: margin 0.3s ease;
+}
+
+.shifted-left #searchContainer {
+    margin-left: 200px;
+}
+
+.shifted-right #searchContainer {
+    margin-right: 300px; 
+}
+
+.shifted-left {
+    margin-left: 250px;
+}
+
+.shifted-right {
+    margin-right: 25%;
+}
+
+/* TIME SHIFT */
+.shifted-left-time {
+    margin-left: 250px;
+}
+
+.shifted-right-time {
+    margin-right: 25%;
+}
+
+.button-top {
+    display: flex;
+    gap: 0; /* remove gap to prevent width overflow */
+    width: 100%;
+}
+
+.display-screen {
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* PRODUCT DISPLAY */
+.product-display {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 10px;
+    transition: margin-right 0.3s ease;
+}
+
+.product-display.shifted-right {
+    margin-right: 25%;
+}
+
+.product-card {
+    background: white;
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    cursor: pointer;
+}
+
+.product-card img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.product-name {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 8px;
+}
+
+.product-price {
+    color: green;
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+.top-bar .btn-light.btn-sm img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+}
+
+.top-bar .btn-light.btn-sm {
+    padding: 2px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#dateTime {
+    color: black;
+    font-weight: bold;
+}
+
+
+.date-box, .time-box {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.icon-button {
+    background: white;
+    border: none;
+    padding: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.icon-img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+#dateText, #timeText {
+    font-size: 14px;
+    color: #333;
+}
+
+/* WRAPPER */
+#trackDrawer {
+    position: fixed;
+    bottom: -260px; /* hidden state */
+    left: 0;
+    width: 100%;
+    height: 100px;
+    width: calc(100% - 25%); /* leave space for orderContainer on the right */
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    transition: bottom 0.3s ease;
+    z-index: 1500;
+}
+
+/* OPEN STATE */
+#trackDrawer.open {
+    bottom: 0;
+}
+
+/* PULL HANDLE (1/8 WIDTH) */
+#trackHandle {
+    position: fixed;
+    left: 10px;            /* distance from left edge */
+    bottom: 20px;          /* distance from bottom */
+    background: white;     /* pill background */
+    color: #2563eb;        /* text color */
+    padding: 8px 16px;     /* enough for symbol + text */
+    border-radius: 999px;  /* fully pill-shaped */
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;              /* space between symbol and text */
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 200;
+    transition: transform 0.9s ease;
+}
+
+/* SYMBOL ONLY */
+#trackSymbol {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2563eb; /* blue by default */
+    transition: color 0.25s ease;
+}
+
+/* MAIN DRAWER */
+#trackDrawerContent {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 18px 18px 0 0;
+
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
+
+    padding: 14px 16px;
+}
+
+/* SCROLL AREA */
+.track-scroll {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* SCROLLABLE PILL CONTAINER */
+#trackDrawerContent .track-scroll {
+    display: flex;          /* arrange pills in a row */
+    flex-wrap: nowrap;      /* prevent wrapping */
+    overflow-x: auto;       /* horizontal scroll */
+    overflow-y: hidden;     /* no vertical scroll */
+    gap: 12px;              /* spacing between pills */
+    padding-bottom: 4px;    /* optional for scrollbar spacing */
+    height: 100%;           /* match drawer height */
+    align-items: center;    /* center pills vertically */
+}
+
+/* OPTIONAL: style scrollbar nicely */
+#trackDrawerContent .track-scroll::-webkit-scrollbar {
+    height: 8px;
+}
+
+#trackDrawerContent .track-scroll::-webkit-scrollbar-thumb {
+    background-color: #4da6ff;
+    border-radius: 4px;
+    border: 2px solid #f1f1f1;
+}
+
+#trackDrawerContent .track-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+/* STYLE FOR EACH PILL */
+.order-pill {
+    min-width: 200px;      /* ensure visible width */
+    flex-shrink: 0;        /* prevent shrinking */
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}

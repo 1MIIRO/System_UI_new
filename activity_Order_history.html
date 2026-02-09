@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity - Order History</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='activity_Order_history.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <div class="p-3">
+        <h5>{{ user.personal_name }}</h5>
+        <p>{{ user.job_desc }}</p>
+    </div>
+    <ul class="list-unstyled ps-3">
+        <li><a href="{{ url_for('dashboard') }}">Point_of_sales</a></li>
+        <li><a href="{{ url_for('activity_billing_queue') }}">Activity</a></li>
+        <li><a href="#">Inventory</a></li>
+        <li><a href="#">Teams</a></li>
+        <li><a href="#">Settings</a></li>
+    </ul>
+</div>
+
+<!-- ORDER PANEL -->
+<div id="orderContainer" class="order-container">
+    <div class="order-top-bar" style="display:flex; align-items:center; gap:10px;">
+        <!-- Left notepad button -->
+        <button class="btn btn-light btn-sm">
+            <img src="{{ url_for('static', filename='images/nootpad_icon.jpg') }}" style="width:16px;">
+        </button>
+
+        <!-- Editable texts in the middle -->
+        <div class="order-texts" style="display:flex; flex-direction:column; flex:1; gap:2px;">
+            <div id="customerName" contenteditable="false" class="editable-text">Customer Name</div>
+            <div id="orderNumber" contenteditable="false" class="editable-text">Order Number</div>
+        </div>
+        
+        <!-- Right pencil button -->
+        <button id="editPencil" class="btn btn-light btn-sm">
+            <img src="{{ url_for('static', filename='images/pencil_icon.jpg') }}" style="width:16px;">
+        </button>
+    </div>
+
+    <div class="order-dropdowns p-2">
+        <div class="dropdown">
+            <button class="dropdown-btn">Select Table ▼</button>
+            <div class="dropdown-content" style="display:none; border: 1px solid #ccc; background: #fff; position: absolute; z-index: 1000; max-height: 200px; overflow-y: auto;">
+                {% for table in tables %}
+                    <div class="dropdown-item" data-id="{{ table.Table_db_id }}" style="padding: 5px 10px; cursor: pointer; display:flex; align-items:center; gap:8px;">
+                        <span class="dot" style="width:8px; height:8px; border-radius:50%; background:transparent; display:inline-block;"></span>
+                        Table {{ table.Table_number }}
+                     </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="dropdown">
+            <button class="dropdown-btn" data-default-text="Order Type">Order Type ▼</button>
+            <div class="dropdown-content" style="display:none; border: 1px solid #ccc; background: #fff; position: absolute; z-index: 1000;">
+                <div class="dropdown-item" data-id="dine_in" style="padding: 5px 10px; cursor: pointer; display:flex; align-items:center; gap:8px;">
+                    <span class="dot" style="width:8px; height:8px; border-radius:50%; background:transparent; display:inline-block;"></span>
+                    Dine_in
+                </div>
+                <div class="dropdown-item" data-id="takeaway" style="padding: 5px 10px; cursor: pointer; display:flex; align-items:center; gap:8px;">
+                    <span class="dot" style="width:8px; height:8px; border-radius:50%; background:transparent; display:inline-block;"></span>
+                    Takeaway
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-display-screens" style="display:flex; flex-direction:column; gap:10px; margin-top:0px;">
+        <!-- Display Screen 1 (twice as big) -->
+        <div class="display-screen display-screen-1">
+            <p>-------------</p>
+        </div>
+
+        <!-- Display Screen 2 -->
+        <div class="display-screen display-screen-2">
+            <div class="billing-summary">
+                
+                <div class="billing-row">
+                    <span>Subtotal</span>
+                    <span class="amount">$</span>
+                </div>
+
+                <div class="billing-row">
+                    <span>Tax (10%)</span>
+                    <span class="amount">$</span>
+                </div>
+
+                <div class="billing-row">
+                    <span>Discount</span>
+                    <span class="amount">$</span>
+                </div>
+
+                <div class="billing-separator"></div>
+
+                <div class="billing-row total">
+                    <span>TOTAL</span>
+                    <span class="amount">$</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="order-button-container">
+
+        <!-- TOP ROW -->
+        <div class="button-top">
+            <button class="pill-btn_order">Promo-code</button>
+            <button class="pill-btn_order">QRS</button>
+        </div>
+
+        <!-- BOTTOM ROW -->
+        <div class="button-bottom">
+            <button class="big-action-btn">PLACE ORDER</button>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar d-flex align-items-center">
+    <div id="menuToggle" class="menu-icon">&#9776;</div>
+
+    <div class="breadcrumb ms-3">
+        <span class="breadcrumb-main">Activity</span>
+        <span class="breadcrumb-sub"> / Order History</span>
+    </div>
+
+    <div class="ms-auto d-flex align-items-center gap-2 top-bar-items">
+        <!-- DOWNLOAD BUTTON -->
+        <button id="downloadBtn" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
+            <i class="bi bi-download" style="color:white;"></i>
+        </button>
+
+        <div class="date-box">
+            <button class="icon-button">
+                <img src="{{ url_for('static', filename='images/calendar_icon.jpg') }}" class="icon-img">
+            </button>
+            <span id="dateText">--/--/----</span>
+        </div>
+
+        <div id="orderToggle" class="open-order top-bar-item">Open Order</div>
+    </div>
+</div>
+
+<!-- SEARCH & DATE/TIME FILTER ROW -->
+<div class="container-fluid mt-3">
+    <div class="row align-items-center">
+        <div class="col-3">
+            <input id="search_activity" type="search" class="form-control rounded-input" placeholder="Search...">
+        </div>
+        <div class="col-9 d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-1">
+                <span class="text-muted small">Date:</span>
+                <input type="date" class="form-control form-control-sm rounded-pill pill-input" id="date_start">
+                <input type="date" class="form-control form-control-sm rounded-pill pill-input" id="date_end">
+            </div>
+
+            <div class="d-flex align-items-center gap-1 ms-3">
+                <span class="text-muted small">Time:</span>
+                <input type="time" class="form-control form-control-sm rounded-pill pill-input" id="time_start">
+                <input type="time" class="form-control form-control-sm rounded-pill pill-input" id="time_end">
+            </div>
+
+            <div class="ms-auto d-flex gap-2">
+                <button class="btn btn-light btn-sm"><i class="bi bi-search"></i></button>
+                <button class="btn btn-light btn-sm"><i class="bi bi-funnel"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN ACTIVITY CONTENT -->
+<div id="activityMain">
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <div class="col-3">
+                <div class="vertical-container">
+                    <a href="{{ url_for('activity_billing_queue') }}">Billing Queue</a>
+                    <a href="{{ url_for('activity_Tables') }}">Tables</a>
+                    <a href="{{ url_for('activity_Order_history') }}" class="active">Order History</a>
+                </div>
+            </div>
+           <div class="col-9 d-flex flex-column" style="height: calc(100vh - 130px);">
+                <!-- Table Container -->
+                <div class="activity-display-screen">
+                    <table class="order-history-table">
+                        <thead>
+                        <tr class="pill-header-row">
+                            <th class="pill-header">#</th>
+                            <th class="pill-header">Date & Time</th>
+                            <th class="pill-header">Customer Name</th>
+                            <th class="pill-header">Order Status</th>
+                            <th class="pill-header">Total Payment</th>
+                            <th class="pill-header">Order Type</th>
+                            <th class="pill-header">Orders</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Rows will be dynamically populated from your database -->
+                        </tbody>
+                    </table>
+                    </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPT -->
+<script>
+    // DATE UPDATE
+    function updateDateTime() {
+        const now = new Date();
+        document.getElementById('dateText').textContent = now.toLocaleDateString();
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    // ELEMENTS
+    const orderToggle = document.getElementById('orderToggle');
+    const sidebar = document.getElementById('sidebar');
+    const orderContainer = document.getElementById('orderContainer');
+    const menuToggle = document.getElementById('menuToggle');
+    const activityMain = document.getElementById('activityMain');
+    const topBarItems = document.querySelectorAll('.top-bar-items');
+ 
+    // Track which orders have their details open
+    const openDetails = new Set();
+
+    async function populateOrderHistoryTable() {
+        try {
+            // Call the Flask route to get the orders JSON
+            const response = await fetch('/export_orders');
+            if (!response.ok) throw new Error('Failed to fetch order data');
+            const data = await response.json();
+            const orders = data.orders || [];
+
+            const tbody = document.querySelector('.order-history-table tbody');
+            tbody.innerHTML = ''; // clear existing rows
+
+            orders.forEach((order, index) => {
+                const row = document.createElement('tr');
+
+                // # column
+                const tdHash = document.createElement('td');
+                tdHash.textContent = order["#"] || '';
+                row.appendChild(tdHash);
+
+                // Date & Time
+                const tdDatetime = document.createElement('td');
+                tdDatetime.textContent = order["order_datetime"] || '';
+                row.appendChild(tdDatetime);
+
+                // Customer Name
+                const tdCustomer = document.createElement('td');
+                tdCustomer.textContent = order["customer_name"] || '';
+                row.appendChild(tdCustomer);
+
+                // Order Status
+                const tdStatus = document.createElement('td');
+                tdStatus.textContent = order["order_status"] || '';
+                row.appendChild(tdStatus);
+
+                // Total Payment
+                const tdTotal = document.createElement('td');
+                tdTotal.textContent = order["Total_ammount"] || '';
+                row.appendChild(tdTotal);
+
+                // Order Type
+                const tdType = document.createElement('td');
+                tdType.textContent = order["order_categories_name"] || '';
+                row.appendChild(tdType);
+
+                // Orders (details button)
+                const tdOrders = document.createElement('td');
+                const detailsBtn = document.createElement('button');
+                detailsBtn.textContent = "Details";
+                detailsBtn.classList.add('btn', 'btn-sm', 'btn-primary');
+                tdOrders.appendChild(detailsBtn);
+                row.appendChild(tdOrders);
+
+                tbody.appendChild(row);
+
+                // Hidden details row
+                const detailsTr = document.createElement('tr');
+                detailsTr.id = `details-${index}`;
+                detailsTr.style.display = openDetails.has(order.order_ID) ? "" : "none"; // restore open state
+
+                const goodsList = order.goods.map(g => `${g.product_name} ($${g.price_paid})`).join(", ");
+
+                detailsTr.innerHTML = `
+                    <td colspan="7">
+                        <table class="table table-bordered table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Table#number</th>
+                                    <th>Variety of goods</th>
+                                    <th>init_time</th>
+                                    <th>prep_time</th>
+                                    <th>time of cancelation if any</th>
+                                    <th>Number of goods</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${order.Table_db_id || '-'}</td>
+                                    <td>${order.goods.length}</td>
+                                    <td>${order.duration_to_get_started || '-'}</td>
+                                    <td>${order.duration_to_get_completed || '-'}</td>
+                                    <td>${order.time_cancelled || '-'}</td>
+                                    <td>${goodsList || '-'}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                `;
+                tbody.appendChild(detailsTr);
+
+                // Toggle details on click
+                detailsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (detailsTr.style.display === "none") {
+                        detailsTr.style.display = "";
+                        openDetails.add(order.order_ID);
+                    } else {
+                        detailsTr.style.display = "none";
+                        openDetails.delete(order.order_ID);
+                    }
+                });
+            });
+
+        } catch (err) {
+            console.error("Error populating order history table:", err);
+        }
+    }
+
+    // Initial population
+    populateOrderHistoryTable();
+
+    // Refresh every 5 seconds while keeping open rows intact
+    setInterval(populateOrderHistoryTable, 5000);
+
+
+    // SHIFT FUNCTION
+    function shiftUI(shiftSidebar, shiftOrder) {
+        if (shiftSidebar) {
+            activityMain.classList.add('shifted-left');
+            topBarItems.forEach(el => el.classList.add('shifted-left-time'));
+        } else {
+            activityMain.classList.remove('shifted-left');
+            topBarItems.forEach(el => el.classList.remove('shifted-left-time'));
+        }
+
+        if (shiftOrder) {
+            activityMain.classList.add('shifted-right');
+            topBarItems.forEach(el => el.classList.add('shifted-right-time'));
+        } else {
+            activityMain.classList.remove('shifted-right');
+            topBarItems.forEach(el => el.classList.remove('shifted-right-time'));
+        }
+    }
+
+    // SIDEBAR TOGGLE
+    menuToggle.addEventListener('click', () => {
+        orderContainer.classList.remove("active");
+        orderToggle.textContent = "Open Order";
+        orderToggle.classList.remove("close-order");
+        orderToggle.classList.add("open-order");
+
+        sidebar.classList.toggle('active');
+        shiftUI(sidebar.classList.contains('active'), false);
+    });
+
+    // ORDER TOGGLE
+    orderToggle.addEventListener('click', () => {
+        const isOpening = !orderContainer.classList.contains('active');
+
+        if (isOpening) {
+            orderContainer.classList.add("active");
+            orderToggle.textContent = "Close Order";
+            orderToggle.classList.remove("open-order");
+            orderToggle.classList.add("close-order");
+
+            sidebar.classList.remove('active');
+            shiftUI(false, true);
+        } else {
+            orderContainer.classList.remove("active");
+            orderToggle.textContent = "Open Order";
+            orderToggle.classList.remove("close-order");
+            orderToggle.classList.add("open-order");
+
+            shiftUI(false, false);
+        }
+    });
+
+    // CLICKING SIDEBAR CLOSES IT
+    sidebar.addEventListener('click', function () {
+        sidebar.classList.remove('active');
+        shiftUI(false, false);
+    });
+
+   document.addEventListener('DOMContentLoaded', function() {
+
+        // Initialize all dropdown buttons
+        document.querySelectorAll('.dropdown-btn').forEach(btn => {
+            // Store the default text if not already stored
+            if (!btn.dataset.defaultText) {
+                btn.dataset.defaultText = btn.textContent.replace(' ▼','');
+            }
+
+            // Toggle dropdown display
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const content = this.nextElementSibling;
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+
+        // Function to handle selection/unselection
+        function setupDropdownItems(dropdownItems) {
+            dropdownItems.forEach(item => {
+                // Single click = select
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dropdownBtn = this.closest('.dropdown').querySelector('.dropdown-btn');
+                    
+                    // Update button text
+                    dropdownBtn.textContent = this.textContent + ' ▼';
+                    dropdownBtn.dataset.selectedId = this.dataset.id;
+
+                    // Remove highlight from all dots in this dropdown
+                    this.parentElement.querySelectorAll('.dot').forEach(dot => dot.style.background = 'transparent');
+
+                    // Highlight the dot for this selection
+                    this.querySelector('.dot').style.background = 'lightblue';
+
+                    console.log('Selected ID:', this.dataset.id);
+                    // Dropdown stays open
+                });
+
+                // Double click = unselect
+                item.addEventListener('dblclick', function(e) {
+                    e.stopPropagation();
+                    const dropdownBtn = this.closest('.dropdown').querySelector('.dropdown-btn');
+
+                    // Reset button text and selected ID
+                    dropdownBtn.textContent = dropdownBtn.dataset.defaultText + ' ▼';
+                    delete dropdownBtn.dataset.selectedId;
+
+                    // Reset dot
+                    this.querySelector('.dot').style.background = 'transparent';
+
+                    console.log('Option unselected');
+                });
+            });
+        }
+
+        // Apply to all dropdown items
+        document.querySelectorAll('.dropdown-content').forEach(content => {
+            setupDropdownItems(content.querySelectorAll('.dropdown-item'));
+        });
+
+        // Close any dropdown if clicked outside
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.dropdown-content').forEach(content => {
+                content.style.display = 'none';
+            });
+        });
+
+    });
+
+
+</script>
+
+</body>
+</html>

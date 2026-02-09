@@ -1,0 +1,944 @@
+
+ /* GENERAL BODY */
+body {
+    margin: 0;
+    background: #f5f5f5;
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+}
+
+/* SIDEBAR */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #222;
+    overflow-x: hidden;
+    padding-top: 20px;
+    transition: 0.3s;
+    color: white;
+    z-index: 200;
+}
+
+.sidebar.active {
+    width: 170px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px 0;
+    color: #ddd;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    color: white;
+}
+
+/* TOP BAR */
+.top-bar {
+    width: 100%;
+    background: #edeff0;
+    padding: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.menu-icon {
+    font-size: 26px;
+    cursor: pointer;
+    color: blue;
+}
+
+.form-control.rounded-input {
+    background-color: #edeff0 !important;
+    border-radius: 14px;
+    padding: 14px 18px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    font-size: 15px;
+}
+
+.form-control.rounded-input:focus {
+    background-color: #edeff0 !important;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+}
+
+.form-control.rounded-input::placeholder {
+    color: #6c757d;
+}
+
+/* VERTICAL CONTAINER */
+.vertical-container {
+    background-color: #edeff0;
+    border-radius: 14px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: calc(100vh - 80px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.vertical-container a {
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    color: black;
+    text-decoration: none;
+    padding: 12px 0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    background-color: transparent;
+}
+
+.vertical-container a:hover,
+.vertical-container a.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* ORDER PANEL */
+.order-container {
+    width: 25%;
+    min-width: 250px;
+    background: white;
+    color: black;
+    height: 100%;
+    position: fixed;
+    right: -25%;
+    top: 0;
+    transition: 0.4s;
+    z-index: 150;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+}
+
+.order-container.active {
+    right: 0;
+    pointer-events: auto;
+}
+
+.order-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* buttons left & right */
+    border-bottom: 1px solid #ccc;
+    padding: 5px 10px;
+    position: relative; /* needed for absolute centering of middle */
+}
+
+/* Middle editable texts */
+.order-top-bar .order-texts {
+    position: absolute;  /* center independently of buttons */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* perfectly center horizontally & vertically */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Customer Name */
+.order-top-bar .order-texts #customerName {
+    font-weight: bold;
+    color: #050505;
+    font-size: 18px;
+}
+
+/* Order Number */
+.order-top-bar .order-texts #orderNumber {
+    font-weight: 400;
+    color: #6c757d;
+    font-size: 10px;
+}
+
+/* DROPDOWNS */
+.order-dropdowns {
+    display: flex;
+    gap: 5px;
+}
+.order-dropdowns .dropdown { flex: 1; }
+.dropdown-btn {
+    width: 100%;
+    padding: 8px;
+    background: #5178c5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+}
+.dropdown-content {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+    padding: 5px;
+}
+
+.display-screen {
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* Parent container uses flex column */
+.order-display-screens {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* space between screens */
+    height: calc(100% - 150px); /* optional: give total height minus space for buttons */
+}
+
+/* Display Screen 1: larger */
+.display-screen-1 {
+    flex: 3.24;          /* increased from 2.4 → bigger portion */
+    min-height: 300px; 
+    overflow-y: auto;
+}
+
+/* Display Screen 2: smaller, pushed down */
+.display-screen-2 {
+    flex: 1.5;          /* decreased from 1.2 → smaller portion */
+    min-height: 100px; 
+}
+
+/* Custom scrollbar for Webkit browsers (Chrome, Edge, Safari) */
+.display-screen-1::-webkit-scrollbar {
+    width: 8px;
+}
+
+.display-screen-1::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 4px;
+}
+
+.display-screen-1::-webkit-scrollbar-thumb {
+    background-color: #4da6ff; /* light blue */
+    border-radius: 4px;
+    border: 2px solid #f1f1f1; /* adds spacing around thumb */
+}
+
+.billing-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: monospace;   /* 🔑 ensures even spacing */
+}
+
+/* Receipt rows */
+.billing-row {
+    display: grid;
+    grid-template-columns: 1fr 120px; /* forces space before $ */
+    align-items: center;
+}
+
+/* Dollar column */
+.billing-row .amount {
+    text-align: left; /* space remains after $ */
+}
+
+/* Dotted separator */
+.billing-separator {
+    width: 100%;
+    border-top: 2px dotted #000;
+    margin: 6px 0;
+}
+
+/* TOTAL emphasis */
+.billing-row.total {
+    font-weight: bold;
+}
+.order-button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: auto; /* pushes buttons to bottom of the container */
+}
+
+/* TOP ROW */
+.button-top {
+    display: flex;
+    gap: 0; /* remove gap to prevent width overflow */
+    width: 100%;
+}
+
+/* Pill buttons - top row */
+.pill-btn_order {
+    box-sizing: border-box; /* includes padding & border in width */
+    width: calc(50% - 2px); /* split evenly minus small margin */
+    padding: 6px 0;  
+    border-radius: 999px;
+    border: 1px solid #00025d;
+    background: #f8f9fa;
+    font-size: 13px;
+    cursor: pointer;
+    color:#1a2228
+}
+
+.pill-btn_order:hover { border-color: #165030; color: #165030; }
+
+.pill-btn_order:first-child {
+    margin-right: 4px;
+}
+
+.pill-btn_order:last-child {
+    margin-left: 4px;
+}
+
+.button-bottom {
+    width: 100%;
+}
+
+/* BIG BUTTON */
+.big-action-btn {
+    box-sizing: border-box; /* include padding & border in width */
+    width: 100%;
+    padding: 8px 0;
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* SHIFT CLASSES */
+#activityMain {
+    transition: margin 0.4s ease;
+}
+
+#activityMain.shifted-left {
+    margin-left: 170px;
+}
+
+#activityMain.shifted-right {
+    margin-right: 25%;
+}
+
+.shifted-left-time {
+    margin-left: 170px;
+}
+
+.shifted-right-time {
+    margin-right: 25%;
+}
+
+/* TOP BAR ITEMS */
+.top-bar-item {
+    transition: margin 0.4s ease;
+}
+
+/* TIME AND DATE BOXES */
+.date-box, .time-box {
+    background: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.icon-button {
+    background: white;
+    border: none;
+    padding: 2px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+#dateText {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* ORDER TOGGLE */
+.close-order { color: red; cursor: pointer; font-weight: bold; }
+.open-order { color: green; cursor: pointer; font-weight: bold; }
+
+/* ACTIVITY DISPLAY */
+.activity-display-screen {
+    width: 100%;
+    background-color: #edeff0;
+    border-radius: 14px;
+    padding: 20px;
+    min-height: 400px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.activity-display-text {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* PILL INPUTS */
+.pill-input {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+    border-radius: 50px;
+}
+
+.pill-input::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.pill-input:focus,
+.pill-input:hover {
+    outline: none;
+    background-color: #0056b3;
+    color: white;
+}
+
+/* SMALL INPUT */
+.small-input {
+    width: 6rem;
+}
+
+/* BREADCRUMB */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-main {
+    font-weight: 700;
+    color: #0d6efd;
+    font-size: 18px;
+}
+
+.breadcrumb-sub {
+    font-weight: 400;
+    color: #6c757d;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+/* GENERAL BODY */
+body {
+    margin: 0;
+    background: #f5f5f5;
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+}
+
+/* SIDEBAR */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #222;
+    overflow-x: hidden;
+    padding-top: 20px;
+    transition: 0.3s;
+    color: white;
+    z-index: 200;
+}
+
+.sidebar.active {
+    width: 170px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px 0;
+    color: #ddd;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    color: white;
+}
+
+/* TOP BAR */
+.top-bar {
+    width: 100%;
+    background: #edeff0;
+    padding: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.menu-icon {
+    font-size: 26px;
+    cursor: pointer;
+    color: blue;
+}
+
+.form-control.rounded-input {
+    background-color: #edeff0 !important;
+    border-radius: 14px;
+    padding: 14px 18px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    font-size: 15px;
+}
+
+.form-control.rounded-input:focus {
+    background-color: #edeff0 !important;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+}
+
+.form-control.rounded-input::placeholder {
+    color: #6c757d;
+}
+
+/* VERTICAL CONTAINER */
+.vertical-container {
+    background-color: #edeff0;
+    border-radius: 14px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: calc(100vh - 80px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.vertical-container a {
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    color: black;
+    text-decoration: none;
+    padding: 12px 0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    background-color: transparent;
+}
+
+.vertical-container a:hover,
+.vertical-container a.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* ORDER PANEL */
+.order-container {
+    width: 25%;
+    min-width: 250px;
+    background: white;
+    color: black;
+    height: 100%;
+    position: fixed;
+    right: -25%;
+    top: 0;
+    transition: 0.4s;
+    z-index: 150;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+}
+
+.order-container.active {
+    right: 0;
+    pointer-events: auto;
+}
+
+.order-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* buttons left & right */
+    border-bottom: 1px solid #ccc;
+    padding: 5px 10px;
+    position: relative; /* needed for absolute centering of middle */
+}
+
+/* Middle editable texts */
+.order-top-bar .order-texts {
+    position: absolute;  /* center independently of buttons */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* perfectly center horizontally & vertically */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Customer Name */
+.order-top-bar .order-texts #customerName {
+    font-weight: bold;
+    color: #050505;
+    font-size: 18px;
+}
+
+/* Order Number */
+.order-top-bar .order-texts #orderNumber {
+    font-weight: 400;
+    color: #6c757d;
+    font-size: 10px;
+}
+
+/* DROPDOWNS */
+.order-dropdowns {
+    display: flex;
+    gap: 5px;
+}
+.order-dropdowns .dropdown { flex: 1; }
+.dropdown-btn {
+    width: 100%;
+    padding: 8px;
+    background: #5178c5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+}
+.dropdown-content {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+    padding: 5px;
+}
+
+.display-screen {
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* Parent container uses flex column */
+.order-display-screens {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* space between screens */
+    height: calc(100% - 150px); /* optional: give total height minus space for buttons */
+}
+
+/* Display Screen 1: larger */
+.display-screen-1 {
+    flex: 3.24;          /* increased from 2.4 → bigger portion */
+    min-height: 300px; 
+    overflow-y: auto;
+}
+
+/* Display Screen 2: smaller, pushed down */
+.display-screen-2 {
+    flex: 1.5;          /* decreased from 1.2 → smaller portion */
+    min-height: 100px; 
+}
+
+/* Custom scrollbar for Webkit browsers (Chrome, Edge, Safari) */
+.display-screen-1::-webkit-scrollbar {
+    width: 8px;
+}
+
+.display-screen-1::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 4px;
+}
+
+.display-screen-1::-webkit-scrollbar-thumb {
+    background-color: #4da6ff; /* light blue */
+    border-radius: 4px;
+    border: 2px solid #f1f1f1; /* adds spacing around thumb */
+}
+
+.billing-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: monospace;   /* 🔑 ensures even spacing */
+}
+
+/* Receipt rows */
+.billing-row {
+    display: grid;
+    grid-template-columns: 1fr 120px; /* forces space before $ */
+    align-items: center;
+}
+
+/* Dollar column */
+.billing-row .amount {
+    text-align: left; /* space remains after $ */
+}
+
+/* Dotted separator */
+.billing-separator {
+    width: 100%;
+    border-top: 2px dotted #000;
+    margin: 6px 0;
+}
+
+/* TOTAL emphasis */
+.billing-row.total {
+    font-weight: bold;
+}
+.order-button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: auto; /* pushes buttons to bottom of the container */
+}
+
+/* TOP ROW */
+.button-top {
+    display: flex;
+    gap: 0; /* remove gap to prevent width overflow */
+    width: 100%;
+}
+
+/* Pill buttons - top row */
+.pill-btn_order {
+    box-sizing: border-box; /* includes padding & border in width */
+    width: calc(50% - 2px); /* split evenly minus small margin */
+    padding: 6px 0;  
+    border-radius: 999px;
+    border: 1px solid #00025d;
+    background: #f8f9fa;
+    font-size: 13px;
+    cursor: pointer;
+    color:#1a2228
+}
+
+.pill-btn_order:hover { border-color: #165030; color: #165030; }
+
+.pill-btn_order:first-child {
+    margin-right: 4px;
+}
+
+.pill-btn_order:last-child {
+    margin-left: 4px;
+}
+
+.button-bottom {
+    width: 100%;
+}
+
+/* BIG BUTTON */
+.big-action-btn {
+    box-sizing: border-box; /* include padding & border in width */
+    width: 100%;
+    padding: 8px 0;
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* SHIFT CLASSES */
+#activityMain {
+    transition: margin 0.4s ease;
+}
+
+#activityMain.shifted-left {
+    margin-left: 170px;
+}
+
+#activityMain.shifted-right {
+    margin-right: 25%;
+}
+
+.shifted-left-time {
+    margin-left: 170px;
+}
+
+.shifted-right-time {
+    margin-right: 25%;
+}
+
+/* TOP BAR ITEMS */
+.top-bar-item {
+    transition: margin 0.4s ease;
+}
+
+/* TIME AND DATE BOXES */
+.date-box, .time-box {
+    background: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.icon-button {
+    background: white;
+    border: none;
+    padding: 2px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+#dateText {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* ORDER TOGGLE */
+.close-order { color: red; cursor: pointer; font-weight: bold; }
+.open-order { color: green; cursor: pointer; font-weight: bold; }
+
+/* ACTIVITY DISPLAY */
+.activity-display-screen {
+    width: 100%;
+    background-color: #edeff0;
+    border-radius: 14px;
+    padding: 20px;
+    min-height: 400px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.activity-display-text {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* PILL INPUTS */
+.pill-input {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+    border-radius: 50px;
+}
+
+.pill-input::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.pill-input:focus,
+.pill-input:hover {
+    outline: none;
+    background-color: #0056b3;
+    color: white;
+}
+
+/* SMALL INPUT */
+.small-input {
+    width: 6rem;
+}
+
+/* BREADCRUMB */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-main {
+    font-weight: 700;
+    color: #0d6efd;
+    font-size: 18px;
+}
+
+.breadcrumb-sub {
+    font-weight: 400;
+    color: #6c757d;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+/* CONTAINER */
+.activity-display-screen {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;   /* horizontal scroll */
+    overflow-y: auto;      /* horizontal + vertical scroll */
+    padding: 16px;
+    background-color: #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* TABLE */
+.order-history-table {
+    border-collapse: separate;
+    border-spacing: 0;      /* spacing handled by padding */
+    table-layout: fixed;
+    width: max-content;     /* allows horizontal scroll if too wide */
+    min-width: 100%;
+}
+
+/* HEADERS (Pill style) */
+.order-history-table th {
+    background-color: #5178c5;
+    color: white;
+    font-weight: 600;
+    border-radius: 30px 30px 0 0; /* top-pill shape */
+    padding: 15px 17px;
+    text-align: center;
+    width: 220px;           /* all columns equal width */
+    box-shadow: inset 0 -2px 0 #333; /* underline line at bottom of pill */
+}
+
+
+/* BODY ROWS */
+.order-history-table td {
+    width: 220px;
+    padding: 12px 16px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+}
+
+/* Optional: alternate row coloring */
+.order-history-table tbody tr:nth-child(odd) {
+    background-color: #f8f8f8;
+}
+
+/* Scrollbars for container */
+.activity-display-screen::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.activity-display-screen::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.activity-display-screen::-webkit-scrollbar-thumb {
+    background-color: #5178c5;
+    border-radius: 4px;
+    border: 2px solid #f1f1f1;
+}
