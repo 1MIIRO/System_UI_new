@@ -1603,88 +1603,182 @@ def update_order_status():
     cursor = conn.cursor()
     audit_cursor = conn.cursor(dictionary=True)
 
-    # Get order_ID
-    cursor.execute("""
-        SELECT order_ID FROM orders_improved_table
-        WHERE order_identification_number = %s
-    """, (order_ident_number,))
-    result = cursor.fetchone()
+    try:
+        # Get order_ID
+        cursor.execute("""
+            SELECT order_ID FROM orders_improved_table
+            WHERE order_identification_number = %s
+        """, (order_ident_number,))
+        result = cursor.fetchone()
 
-    if not result:
+        if not result:
+            return jsonify({'success': False, 'message': 'Order not found'}), 404
+
+        order_id = result[0]
+        now = datetime.now()
+
+        # Insert new order state
+        cursor.execute("""
+            INSERT INTO order_with_state (order_ID, order_status_id, LAST_UPDATE)
+            VALUES (%s, %s, %s)
+        """, (order_id, new_status_id, now))
+
+        # Update order last update
+        cursor.execute("""
+            UPDATE orders_improved_table
+            SET LAST_UPDATE = %s
+            WHERE order_ID = %s
+        """, (now, order_id))
+
+        # Get status name
+        audit_cursor.execute("""
+            SELECT order_status FROM order_status
+            WHERE order_status_id = %s
+        """, (new_status_id,))
+        status_row = audit_cursor.fetchone()
+        status_name = status_row['order_status'] if status_row else None
+
+        # 🔥 RECORD SOLD ITEMS ONLY IF COMPLETED
+        sold_count = 0
+        if status_name == 'complete':
+            sold_count = record_sold_items(order_id, conn)
+
+        # ===== AUDIT LOG =====
+        audit_cursor.execute("""
+            SELECT description_audit_id
+            FROM Description_audit
+            WHERE Description_Title = %s
+        """, ("ORDER",))
+        desc = audit_cursor.fetchone()
+
+        if desc:
+            description_audit_id = desc['description_audit_id']
+            user_id = session['user_id']
+            user_name = session.get('user_name', 'UNKNOWN')
+            personal_name = session.get('personal_name', 'UNKNOWN')
+            job_desc = session.get('job_desc', 'UNKNOWN')
+
+            audit_date = now.date()
+            audit_time = now.time().replace(microsecond=0)
+
+            cursor.execute("""
+                INSERT INTO Audit_Logs (audit_reference_number, action, audit_date, audit_time, done_by)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (
+                "TEMP",
+                "",
+                audit_date,
+                audit_time,
+                f"{user_id}---{personal_name}---{user_name}"
+            ))
+
+            audit_ID = cursor.lastrowid
+            audit_reference_number = f"#{audit_ID}.{user_id}.{description_audit_id}"
+
+            action_text = (
+                f"Order #{order_ident_number} status changed to {status_name} "
+                f"by {user_name} ({job_desc}). "
+                f"Items recorded: {sold_count}"
+            )
+
+            cursor.execute("""
+                UPDATE Audit_Logs
+                SET audit_reference_number=%s, action=%s
+                WHERE audit_ID=%s
+            """, (audit_reference_number, action_text, audit_ID))
+
+            cursor.execute("""
+                INSERT INTO audit_desc (audit_ID, description_audit_id)
+                VALUES (%s, %s)
+            """, (audit_ID, description_audit_id))
+
+        conn.commit()
+        return jsonify({'success': True, 'sold_items_recorded': sold_count})
+
+    except Exception as e:
+        conn.rollback()
+        print("Error updating order status:", e)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+    finally:
         cursor.close()
         audit_cursor.close()
         conn.close()
-        return jsonify({'success': False, 'message': 'Order not found'}), 404
 
-    order_id = result[0]
+def record_sold_items(order_id, conn):
+    """
+    Insert items from a completed order into product_sold
+    Prevents duplicate inserts
+    """
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT od.product_purchased AS good_number,
+               od.item_quantities AS quantity
+        FROM order_detials od
+        WHERE od.order_refrence_number = %s
+          AND NOT EXISTS (
+              SELECT 1 FROM product_sold ps
+              WHERE ps.good_number = od.product_purchased
+              AND ps.sold_at IS NOT NULL
+          )
+    """, (order_id,))
+
+    items = cursor.fetchall()
     now = datetime.now()
 
-    # Insert order state
-    cursor.execute("""
-        INSERT INTO order_with_state (order_ID, order_status_id, LAST_UPDATE)
-        VALUES (%s, %s, %s)
-    """, (order_id, new_status_id, now))
-
-    # Update order table
-    cursor.execute("""
-        UPDATE orders_improved_table
-        SET LAST_UPDATE = %s
-        WHERE order_ID = %s
-    """, (now, order_id))
-
-    # Get description audit ID
-    audit_cursor.execute(
-        "SELECT description_audit_id FROM Description_audit WHERE Description_Title=%s",
-        ("ORDER",)
-    )
-    desc = audit_cursor.fetchone()
-
-    if desc:
-        description_audit_id = desc['description_audit_id']
-        user_id = session['user_id']
-        user_name = session.get('user_name', 'UNKNOWN')
-        personal_name = session.get('personal_name', 'UNKNOWN')
-        job_desc = session.get('job_desc', 'UNKNOWN')
-
-        audit_date = now.date()
-        audit_time = now.time().replace(microsecond=0)
-
+    for item in items:
         cursor.execute("""
-            INSERT INTO Audit_Logs (audit_reference_number, action, audit_date, audit_time, done_by)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO product_sold (good_number, quantity_sold, sold_at)
+            VALUES (%s, %s, %s)
         """, (
-            "TEMP",
-            "",
-            audit_date,
-            audit_time,
-            f"{user_id}---{personal_name}---{user_name}"
+            item['good_number'],
+            item['quantity'],
+            now
         ))
 
-        audit_ID = cursor.lastrowid
-        audit_reference_number = f"#{audit_ID}.{user_id}.{description_audit_id}"
+    return len(items)
 
-        action_text = (
-            f"Order #{order_ident_number} status changed by "
-            f"{user_name} ({job_desc}). New status ID: {new_status_id}"
-        )
+@app.route('/record_completed_orders_sold', methods=['POST'])
+def record_completed_orders_sold():
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
 
+        # 1️⃣ Get all orders marked as 'Completed' that haven't been recorded yet
         cursor.execute("""
-            UPDATE Audit_Logs
-            SET audit_reference_number=%s, action=%s
-            WHERE audit_ID=%s
-        """, (audit_reference_number, action_text, audit_ID))
+            SELECT o.order_identification_number, od.product_purchased AS good_number, od.item_quantities AS quantity
+            FROM orders_improved_table o
+            JOIN order_detials od ON o.order_identification_number = od.order_refrence_number
+            JOIN order_with_state ws ON o.order_identification_number = ws.order_ID
+            JOIN order_status os ON ws.order_status_id = os.order_status_id
+            WHERE os.order_status = 'Completed'
+        """)
+        completed_items = cursor.fetchall()
 
-        cursor.execute("""
-            INSERT INTO audit_desc (audit_ID, description_audit_id)
-            VALUES (%s, %s)
-        """, (audit_ID, description_audit_id))
+        if not completed_items:
+            return jsonify({"success": True, "message": "No completed orders found"}), 200
 
-    conn.commit()
-    cursor.close()
-    audit_cursor.close()
-    conn.close()
+        # 2️⃣ Insert each item into product_sold
+        for item in completed_items:
+            cursor.execute("""
+                INSERT INTO product_sold (good_number, quantity_sold, sold_at)
+                VALUES (%s, %s, %s)
+            """, (
+                item['good_number'],
+                item['quantity'],
+                datetime.now()
+            ))
 
-    return jsonify({'success': True})
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"success": True, "message": f"{len(completed_items)} products recorded as sold"})
+
+    except Exception as e:
+        print("Error recording completed orders:", e)
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/save_table_reservation', methods=['POST'])
 def save_table_reservation():

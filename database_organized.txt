@@ -936,166 +936,144 @@ Audit_log
 			);
 			
 ****************************************************************************************************			
-CREATE TABLE Products_quantity (
-    Products_quantity_ID INT AUTO_INCREMENT PRIMARY KEY,
+
+INSERT INTO Products_quantity (good_number, products_Quantity, created_at) VALUES
+(1, 85, NOW()),
+(2, 88, NOW()),
+(3, 81, NOW()),
+(4, 90, NOW()),
+(5, 84, NOW()),
+(6, 87, NOW()),
+(7, 82, NOW()),
+(8, 89, NOW()),
+(9, 86, NOW()),
+(10, 83, NOW()),
+(11, 80, NOW()),
+(12, 88, NOW()),
+(13, 85, NOW()),
+(14, 90, NOW()),
+(15, 82, NOW()),
+(16, 87, NOW()),
+(17, 84, NOW()),
+(18, 89, NOW()),
+(19, 81, NOW()),
+(20, 86, NOW()),
+(21, 83, NOW()),
+(22, 88, NOW()),
+(23, 85, NOW()),
+(24, 90, NOW()),
+(25, 82, NOW()),
+(26, 87, NOW()),
+(27, 84, NOW()),
+(28, 89, NOW()),
+(29, 81, NOW()),
+(30, 86, NOW()),
+(31, 83, NOW()),
+(32, 80, NOW()),
+(33, 88, NOW());
+
+*********************************************************************************************************
+
+-- DROP OLD TABLES
+DROP TABLE IF EXISTS product_stock_initial;
+DROP TABLE IF EXISTS product_sold;
+DROP TABLE IF EXISTS product_quantity_current;
+DROP TABLE IF EXISTS product_qty_status;
+DROP TABLE IF EXISTS product_qty_status_history;
+
+-- CREATE NEW TABLES
+
+-- 1. Product Stock Initial
+CREATE TABLE product_stock_initial (
+    good_number INT PRIMARY KEY,
+    initial_quantity INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (good_number)
+        REFERENCES products(good_number)
+);
+
+-- 2. Product Sold
+CREATE TABLE product_sold (
+    sold_id INT AUTO_INCREMENT PRIMARY KEY,
     good_number INT NOT NULL,
-    products_Quantity INT NOT NULL,
-
-    CONSTRAINT fk_products_quantity_product
-        FOREIGN KEY (good_number)
+    quantity_sold INT NOT NULL,
+    sold_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (good_number)
         REFERENCES products(good_number)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
 );
-			
-+----------------------+------+------+-----+---------+----------------+
-| Field                | Type | Null | Key | Default | Extra          |
-+----------------------+------+------+-----+---------+----------------+
-| Products_quantity_ID | int  | NO   | PRI | NULL    | auto_increment |
-| good_number          | int  | NO   | MUL | NULL    |                |
-| products_Quantity    | int  | NO   |     | NULL    |                |
-+----------------------+------+------+-----+---------+----------------+
-3 rows in set (0.04 sec)
 
-INSERT INTO Products_quantity (good_number, products_Quantity) VALUES
-(1, 85),
-(2, 88),
-(3, 81),
-(4, 90),
-(5, 84),
-(6, 87),
-(7, 82),
-(8, 89),
-(9, 86),
-(10, 83),
-(11, 80),
-(12, 88),
-(13, 85),
-(14, 90),
-(15, 82),
-(16, 87),
-(17, 84),
-(18, 89),
-(19, 81),
-(20, 86),
-(21, 83),
-(22, 88),
-(23, 85),
-(24, 90),
-(25, 82),
-(26, 87),
-(27, 84),
-(28, 89),
-(29, 81),
-(30, 86),
-(31, 83),
-(32, 88),
-(33, 85);
-
-			
-**************************************************************************************************			
-			
-	CREATE TABLE product_category_quantites (
-    product_category_quantites_id INT AUTO_INCREMENT PRIMARY KEY,
-    product_category_number INT NOT NULL,
-    product_categories_quantities INT NOT NULL,
-
-    CONSTRAINT fk_category_quantities_category
-        FOREIGN KEY (product_category_number)
-        REFERENCES product_categories(product_category_number)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
-);
- 		
-+-------------------------------+------+------+-----+---------+----------------+
-| Field                         | Type | Null | Key | Default | Extra          |
-+-------------------------------+------+------+-----+---------+----------------+
-| product_category_quantites_id | int  | NO   | PRI | NULL    | auto_increment |
-| product_category_number       | int  | NO   | MUL | NULL    |                |
-| product_categories_quantities | int  | NO   |     | NULL    |                |
-+-------------------------------+------+------+-----+---------+----------------+
-3 rows in set (0.00 sec)
-			
-****************************************************************************************************			
-			
-
-CREATE TABLE Inventory_product_tracker (
-    Inventory_product_tracker_id INT AUTO_INCREMENT PRIMARY KEY,
-
-    Inventory_product_tracker_reference_number VARCHAR(50) NOT NULL,
-    -- Example: IPT-12-45#
-
-    Inventory_product INT NOT NULL,
-    reducted_qty INT NOT NULL,
-
-    CONSTRAINT fk_inventory_product
-        FOREIGN KEY (Inventory_product)
+-- 3. Product Current Quantity
+CREATE TABLE product_quantity_current (
+    good_number INT PRIMARY KEY,
+    current_quantity INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (good_number)
         REFERENCES products(good_number)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
-);
-		
-			
-**************************************************************************************************************			
-	CREATE TABLE Inventory_product_tracker_status (
-    Inventory_product_tracker_status_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Inventory_product_tracker_status VARCHAR(30) NOT NULL UNIQUE
 );
 
-+-------------------------------------+-------------+------+-----+---------+----------------+
-| Field                               | Type        | Null | Key | Default | Extra          |
-+-------------------------------------+-------------+------+-----+---------+----------------+
-| Inventory_product_tracker_status_ID | int         | NO   | PRI | NULL    | auto_increment |
-| Inventory_product_tracker_status    | varchar(30) | NO   | UNI | NULL    |                |
-+-------------------------------------+-------------+------+-----+---------+----------------+
-2 rows in set (0.00 sec)
+-- 4. Product Quantity Status
+CREATE TABLE product_qty_status (
+    status_name VARCHAR(30) PRIMARY KEY
+);
 
-INSERT INTO Inventory_product_tracker_status 
-(Inventory_product_tracker_status)
-VALUES
-('IN_STOCK'),          -- qty > 70%
-('MID_STOCK'),         -- 40% - 70%
-('APPROACHING_LOW'),   -- 20% - 40%
-('LOW_STOCK'),         -- 1% - 20%
-('OUT_OF_STOCK');      -- 0
-************************************************************************************************************************
-CREATE TABLE IVENTORY_CHECK (
-    IVENTORY_CHECK_ID INT AUTO_INCREMENT PRIMARY KEY,
+INSERT INTO product_qty_status (status_name) VALUES
+('IN_STOCK'),
+('MID_STOCK'),
+('APPROACHING_LOW'),
+('LOW_STOCK'),
+('OUT_OF_STOCK');
 
-    Products_quantity_ID INT NOT NULL,
-    Inventory_product_tracker_id INT NOT NULL,
-    Inventory_product_tracker_status_ID INT NOT NULL,
-
-    CONSTRAINT fk_check_products_quantity
-        FOREIGN KEY (Products_quantity_ID)
-        REFERENCES Products_quantity(Products_quantity_ID)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-
-    CONSTRAINT fk_check_product_tracker
-        FOREIGN KEY (Inventory_product_tracker_id)
-        REFERENCES Inventory_product_tracker(Inventory_product_tracker_id)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-
-    CONSTRAINT fk_check_tracker_status
-        FOREIGN KEY (Inventory_product_tracker_status_ID)
-        REFERENCES Inventory_product_tracker_status(Inventory_product_tracker_status_ID)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
+-- 5. Product Quantity Status History
+CREATE TABLE product_qty_status_history (
+    good_number INT NOT NULL,
+    status_name VARCHAR(30) NOT NULL,
+    recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (good_number)
+        REFERENCES products(good_number),
+    FOREIGN KEY (status_name)
+        REFERENCES product_qty_status(status_name)
 );
 
 
 
-**********************************************************************************************
-INSERT INTO product_category_quantites (product_category_number, product_categories_quantities)
-SELECT 
-    pct.product_category_number,
-    SUM(pq.products_Quantity) AS category_total
-FROM products_category_table pct
-JOIN Products_quantity pq
-    ON pq.good_number = pct.product_number
-GROUP BY pct.product_category_number;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6.
+DESCRIBE  product_stock_initial; 
+DESCRIBE  product_sold;
+DESCRIBE  product_quantity_current;
+DESCRIBE  product_qty_status;
+DESCRIBE  product_qty_status_history;
+
+
+
+
+
 
 
 +----------------------------------+

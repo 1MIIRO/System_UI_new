@@ -1,11 +1,23 @@
 
  Table_display_Inventory
- 
-+-------------------------------+---------------------+--------------------+ 
-| products_quantity.good_number | products.good_name  | product.image_path | 
-+-------------------------------+---------------------+--------------------+
-|                               |                     |                    |
-+-------------------------------+---------------------+--------------------+
+ For every products.good_number in products table 
+
++---------------------+--------------------+-----------------+------------------------------------------+-------------------------------------+
+| Products Image      | Product Name       | Product Price   | Product Category                         | Product initial Inventory           |
++---------------------+--------------------+-----------------+------------------------------------------+-------------------------------------+
+| products.image_path | products.good_name | products.price  | product_categories.product_category_name | products_quantity.products_Quantity |
++---------------------+--------------------+-----------------+------------------------------------------+-------------------------------------+
+
+Products Image = get products.image_path on same row as products.good_number
+
+Product Name =  get products.good_name on same row as products.good_number
+
+Product Price = get products.good_name on same row as products.good_number
+
+Product Category = were products_category_table.good_number = products.good_number get products_category_table.product_category_number 
+                   return  product_categories.product_category_name were product_categories.product_category_number = products_category_table.product_category_number
+
+Product initial Inventory = were Products_quantity.good_number  = products.good_number get products_quantity.products_Quantity  
 
 
 
@@ -15,61 +27,176 @@
 
 
 
-products_category_table
+
+Products
++-------------+---------------+------+-----+---------+----------------+
+| Field       | Type          | Null | Key | Default | Extra          |
++-------------+---------------+------+-----+---------+----------------+
+| good_number | int           | NO   | PRI | NULL    | auto_increment |
+| good_name   | varchar(255)  | NO   |     | NULL    |                |
+| price       | decimal(10,2) | NO   |     | NULL    |                |
+| image_path  | varchar(500)  | YES  |     | NULL    |                |
+| description | text          | YES  |     | NULL    |                |
++-------------+---------------+------+-----+---------+----------------+
+5 rows in set (0.04 sec)
+
+
+product_categories
++-------------------------+--------------+------+-----+---------+----------------+
+| Field                   | Type         | Null | Key | Default | Extra          |
++-------------------------+--------------+------+-----+---------+----------------+
+| product_category_number | int          | NO   | PRI | NULL    | auto_increment |
+| product_category_name   | varchar(255) | NO   |     | NULL    |                |
++-------------------------+--------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+
+products_category_table;
 +-------------------------+------+------+-----+---------+-------+
 | Field                   | Type | Null | Key | Default | Extra |
 +-------------------------+------+------+-----+---------+-------+
 | product_number          | int  | NO   | MUL | NULL    |       |
 | product_category_number | int  | NO   | MUL | NULL    |       |
 +-------------------------+------+------+-----+---------+-------+
-2 rows in set (0.04 sec)
+2 rows in set (0.01 sec)
+
+mysql> DESCRIBE  product_stock_initial;
++--------------------------+-----------+------+-----+-------------------+-------------------+
+| Field                    | Type      | Null | Key | Default           | Extra             |
++--------------------------+-----------+------+-----+-------------------+-------------------+
+| product_stock_initial_id | int       | NO   | PRI | NULL              | auto_increment    |
+| good_number              | int       | NO   | MUL | NULL              |                   |
+| initial_quantity         | int       | NO   |     | NULL              |                   |
+| created_at               | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++--------------------------+-----------+------+-----+-------------------+-------------------+
+4 rows in set (0.01 sec)
+
+mysql> DESCRIBE  product_sold;
++---------------+-----------+------+-----+-------------------+-------------------+
+| Field         | Type      | Null | Key | Default           | Extra             |
++---------------+-----------+------+-----+-------------------+-------------------+
+| sold_id       | int       | NO   | PRI | NULL              | auto_increment    |
+| good_number   | int       | NO   | MUL | NULL              |                   |
+| quantity_sold | int       | NO   |     | NULL              |                   |
+| sold_at       | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++---------------+-----------+------+-----+-------------------+-------------------+
+4 rows in set (0.00 sec)
+
+mysql> DESCRIBE  product_quantity_current;
++------------------+-----------+------+-----+-------------------+-----------------------------------------------+
+| Field            | Type      | Null | Key | Default           | Extra                                         |
++------------------+-----------+------+-----+-------------------+-----------------------------------------------+
+| good_number      | int       | NO   | PRI | NULL              |                                               |
+| current_quantity | int       | NO   |     | NULL              |                                               |
+| updated_at       | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++------------------+-----------+------+-----+-------------------+-----------------------------------------------+
+3 rows in set (0.00 sec)
+
+mysql> DESCRIBE  product_qty_status;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| status_name | varchar(30) | NO   | PRI | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+1 row in set (0.00 sec)
+
+mysql> DESCRIBE  product_qty_status_history;
++-------------+-------------+------+-----+-------------------+-------------------+
+| Field       | Type        | Null | Key | Default           | Extra             |
++-------------+-------------+------+-----+-------------------+-------------------+
+| good_number | int         | NO   | MUL | NULL              |                   |
+| status_name | varchar(30) | NO   | MUL | NULL              |                   |
+| recorded_at | timestamp   | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++-------------+-------------+------+-----+-------------------+-------------------+
+ 
+ 
+ 
+ 
 
 
-products_quantity
-+----------------------+------+------+-----+---------+----------------+
-| Field                | Type | Null | Key | Default | Extra          |
-+----------------------+------+------+-----+---------+----------------+
-| Products_quantity_ID | int  | NO   | PRI | NULL    | auto_increment |
-| good_number          | int  | NO   | MUL | NULL    |                |
-| products_Quantity    | int  | NO   |     | NULL    |                |
-+----------------------+------+------+-----+---------+----------------+
-3 rows in set (0.06 sec)
+
+
++-----------------------------+
+| audit_desc                  |
+| audit_logs                  |
+| customer_order              |
+| customer_table_reservations |
+| description_audit           |
+| order_categories            |
+| order_detials               |
+| order_payment_status        |
+| order_status                |
+| order_with_categories       |
+| order_with_state            |
+| order_with_state_payment    |
+| orders_improved_table       |
+| product_categories          |
+| product_category_quantites  |
+| products                    |
+| products_category_table     |
+| reservation_status          |
+| table_floor                 |
+| table_reservation_link      |
+| table_reservation_status    |
+| table_reservations          |
+| tables                      |
+| user                        |
+| user_reservations           |
++-----------------------------+
+25 rows in set (0.05 sec)
+
+
+PRODUCTS STOKE-INTAKE
+
+For all products in the table products
+
++----------------------+---------------------+--------------------+-------------------------------------------+------------------------------------------+
+| products.image_path  | products.good_name  | products. price    | product_categories.product_category_name  | product_stock_initial.initial_quantity   |
++----------------------+---------------------+--------------------+-------------------------------------------+------------------------------------------+
 
 
 
-+----------------------------------+
-| Tables_in_bakery_busness         |
-+----------------------------------+
-| audit_desc                       |
-| audit_logs                       |
-| customer_order                   |
-| customer_table_reservations      |
-| description_audit                |
-| inventory_product_tracker        |
-| inventory_product_tracker_status |
-| iventory_check                   |
-| order_categories                 |
-| order_detials                    |
-| order_payment_status             |
-| order_status                     |
-| order_with_categories            |
-| order_with_state                 |
-| order_with_state_payment         |
-| orders_improved_table            |
-| product_categories               |
-| product_category_quantites       |
-| products                         |
-| products_category_table          |
-| products_quantity                |
-| reservation_status               |
-| table_floor                      |
-| table_reservation_link           |
-| table_reservation_status         |
-| table_reservations               |
-| tables                           |
-| user                             |
-| user_reservations                |
-+----------------------------------+
+
+
+
+
+DESCRIBE  product_sold;
++---------------+-----------+------+-----+-------------------+-------------------+
+| Field         | Type      | Null | Key | Default           | Extra             |
++---------------+-----------+------+-----+-------------------+-------------------+
+| sold_id       | int       | NO   | PRI | NULL              | auto_increment    |
+| good_number   | int       | NO   | MUL | NULL              |                   |
+| quantity_sold | int       | NO   |     | NULL              |                   |
+| sold_at       | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++---------------+-----------+------+-----+-------------------+-------------------+
+4 rows in set (0.00 sec)
+
+
+get good_name 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
