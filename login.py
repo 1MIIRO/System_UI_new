@@ -59,7 +59,7 @@ def get_connection():
     return mysql.connector.connect(
         host='localhost',
         user='root',
-        password='1234',
+        password='',
         database='bakery_busness'
     )
 
@@ -223,52 +223,13 @@ def get_reservation_statuses():
     return jsonify(reservationstatuses )
 
 
-@app.route('/inventory_page')
-def inventory_page():
-    if 'user_id' not in session:
-        return redirect(url_for('login_page'))
 
-    # User info
-    user_info = {
-        "user_name": session.get('user_name'),
-        "personal_name": session.get('personal_name'),
-        "job_desc": session.get('job_desc')
-    }
-
-    # --- Fetch product categories ---
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT p.good_number, p.good_name, p.price, p.description, p.image_path,
-               c.product_category_name AS good_category
-        FROM products p
-        LEFT JOIN products_category_table pct ON p.good_number = pct.product_number
-        LEFT JOIN product_categories c ON pct.product_category_number = c.product_category_number
-        ORDER BY p.good_number
-    """)
-    products = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    # Convert image paths for Flask static files
-    for item in products:
-        # Ensure path works with url_for
-        item['image_path'] = item['image_path'].replace("\\", "/")  # Windows paths to slashes
-        if item['image_path'].startswith("static/"):
-            item['image_path'] = item['image_path'][7:]  # remove 'static/' prefix
-
-    return render_template(
-        'inventory.html',
-        user=user_info,
-        products=products
-    )
-  
 from decimal import Decimal
 
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "1234",
+    "password": "",
     "database": "bakery_busness"
 }
 
@@ -2235,6 +2196,5 @@ def logout():
 if __name__ == "__main__":
  app.run(debug=False)
  
-
 
 
