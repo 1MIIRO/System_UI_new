@@ -5,6 +5,12 @@ from datetime import datetime
 from datetime import datetime, timedelta
 import random
 import string
+from flask import Flask, jsonify
+import json
+import mysql.connector
+from decimal import Decimal
+from datetime import date, datetime, timedelta
+import os
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # Required for sessions
@@ -114,6 +120,81 @@ loginForm.addEventListener('submit', async (e) => {
 </html>
 """
 
+
+@app.route('/')
+def login_page():
+    return render_template_string(login_page_html)
+
+@app.route('/login', methods=['POST'])
+def login():
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # 1️⃣ Check user credentials
+        cursor.execute("SELECT * FROM `user` WHERE user_name=%s AND user_password=%s", (username, password))
+        user = cursor.fetchone()
+
+        if user:
+            # 2️⃣ Save user session
+            session['user_id'] = user['user_id']
+            session['user_name'] = user['user_name']
+            session['personal_name'] = user['personal_name']
+            session['job_desc'] = user['job_desc']
+
+            # 3️⃣ Get Description_audit_id for "LOG-IN"
+            cursor.execute("SELECT description_audit_id FROM Description_audit WHERE Description_Title = %s", ("LOG-IN",))
+            desc_row = cursor.fetchone()
+            if not desc_row:
+                cursor.close()
+                conn.close()
+                return jsonify({"success": False, "error": "LOG-IN description not found"})
+
+            description_audit_id = desc_row['description_audit_id']
+
+            # 4️⃣ Get current date and time
+            now = datetime.now()
+            audit_date = now.date()
+            audit_time = now.time().replace(microsecond=0)
+
+            # 5️⃣ Insert into Audit_Logs (temporary reference number first)
+            cursor.execute("""
+                INSERT INTO Audit_Logs (audit_reference_number, action, audit_date, audit_time, done_by)
+                VALUES (%s, %s, %s, %s, %s)
+            """, ("TEMP", "", audit_date, audit_time, f"{session['user_id']}---{session['personal_name']}---{session['user_name']}"))
+            conn.commit()
+            audit_ID = cursor.lastrowid
+
+            # 6️⃣ Generate audit_reference_number as "#audit_ID.user_id.activity_number"
+            audit_reference_number = f"#{audit_ID}.{session['user_id']}.{description_audit_id}"
+
+            # 7️⃣ Update Audit_Logs with actual reference number and action
+            action_text = f"Login into the system successful done by {session['user_id']}, {session['job_desc']}"
+            cursor.execute("""
+                UPDATE Audit_Logs
+                SET audit_reference_number=%s, action=%s
+                WHERE audit_ID=%s
+            """, (audit_reference_number, action_text, audit_ID))
+            conn.commit()
+
+            # 8️⃣ Insert into audit_desc table
+            cursor.execute("""
+                INSERT INTO audit_desc (audit_ID, description_audit_id)
+                VALUES (%s, %s)
+            """, (audit_ID, description_audit_id))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+
+            return jsonify({"success": True})
+
+        cursor.close()
+        conn.close()
+        return jsonify({"success": False})
+
 def insert_into_order_table(order_number):
     """
     Inserts a new record into order_table
@@ -141,28 +222,48 @@ def get_reservation_statuses():
     conn.close()
     return jsonify(reservationstatuses )
 
-from flask import render_template, session
 
-@app.route('/inventory')
+@app.route('/inventory_page')
 def inventory_page():
-    # Check if user is logged in
     if 'user_id' not in session:
         return redirect(url_for('login_page'))
 
-    # Get user info from session
+    # User info
     user_info = {
         "user_name": session.get('user_name'),
         "personal_name": session.get('personal_name'),
         "job_desc": session.get('job_desc')
     }
-    # Render inventory template with user info
-    return render_template('inventory.html', user=user_info)
 
-from flask import Flask, jsonify
-import json
-import mysql.connector
+    # --- Fetch product categories ---
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT p.good_number, p.good_name, p.price, p.description, p.image_path,
+               c.product_category_name AS good_category
+        FROM products p
+        LEFT JOIN products_category_table pct ON p.good_number = pct.product_number
+        LEFT JOIN product_categories c ON pct.product_category_number = c.product_category_number
+        ORDER BY p.good_number
+    """)
+    products = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    # Convert image paths for Flask static files
+    for item in products:
+        # Ensure path works with url_for
+        item['image_path'] = item['image_path'].replace("\\", "/")  # Windows paths to slashes
+        if item['image_path'].startswith("static/"):
+            item['image_path'] = item['image_path'][7:]  # remove 'static/' prefix
+
+    return render_template(
+        'inventory.html',
+        user=user_info,
+        products=products
+    )
+  
 from decimal import Decimal
-from datetime import date, datetime, timedelta
 
 DB_CONFIG = {
     "host": "localhost",
@@ -344,10 +445,6 @@ def export_orders_route():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-from flask import Flask, request, jsonify
-import json
-import os
-
 INPUT_FILE = "order-history.json"
 OUTPUT_FILE = "order_sorted_info.json"
 
@@ -466,80 +563,6 @@ def filter_orders_route():
         "total_results": len(filtered_orders),
         "output_file": OUTPUT_FILE
     }), 200
-
-@app.route('/')
-def login_page():
-    return render_template_string(login_page_html)
-
-@app.route('/login', methods=['POST'])
-def login():
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        # 1️⃣ Check user credentials
-        cursor.execute("SELECT * FROM `user` WHERE user_name=%s AND user_password=%s", (username, password))
-        user = cursor.fetchone()
-
-        if user:
-            # 2️⃣ Save user session
-            session['user_id'] = user['user_id']
-            session['user_name'] = user['user_name']
-            session['personal_name'] = user['personal_name']
-            session['job_desc'] = user['job_desc']
-
-            # 3️⃣ Get Description_audit_id for "LOG-IN"
-            cursor.execute("SELECT description_audit_id FROM Description_audit WHERE Description_Title = %s", ("LOG-IN",))
-            desc_row = cursor.fetchone()
-            if not desc_row:
-                cursor.close()
-                conn.close()
-                return jsonify({"success": False, "error": "LOG-IN description not found"})
-
-            description_audit_id = desc_row['description_audit_id']
-
-            # 4️⃣ Get current date and time
-            now = datetime.now()
-            audit_date = now.date()
-            audit_time = now.time().replace(microsecond=0)
-
-            # 5️⃣ Insert into Audit_Logs (temporary reference number first)
-            cursor.execute("""
-                INSERT INTO Audit_Logs (audit_reference_number, action, audit_date, audit_time, done_by)
-                VALUES (%s, %s, %s, %s, %s)
-            """, ("TEMP", "", audit_date, audit_time, f"{session['user_id']}---{session['personal_name']}---{session['user_name']}"))
-            conn.commit()
-            audit_ID = cursor.lastrowid
-
-            # 6️⃣ Generate audit_reference_number as "#audit_ID.user_id.activity_number"
-            audit_reference_number = f"#{audit_ID}.{session['user_id']}.{description_audit_id}"
-
-            # 7️⃣ Update Audit_Logs with actual reference number and action
-            action_text = f"Login into the system successful done by {session['user_id']}, {session['job_desc']}"
-            cursor.execute("""
-                UPDATE Audit_Logs
-                SET audit_reference_number=%s, action=%s
-                WHERE audit_ID=%s
-            """, (audit_reference_number, action_text, audit_ID))
-            conn.commit()
-
-            # 8️⃣ Insert into audit_desc table
-            cursor.execute("""
-                INSERT INTO audit_desc (audit_ID, description_audit_id)
-                VALUES (%s, %s)
-            """, (audit_ID, description_audit_id))
-            conn.commit()
-
-            cursor.close()
-            conn.close()
-
-            return jsonify({"success": True})
-
-        cursor.close()
-        conn.close()
-        return jsonify({"success": False})
 
 @app.route('/dashboard')
 def dashboard():
@@ -1642,6 +1665,7 @@ def update_order_status():
         sold_count = 0
         if status_name == 'complete':
             sold_count = record_sold_items(order_id, conn)
+            update_product_quantity_current(conn)
 
         # ===== AUDIT LOG =====
         audit_cursor.execute("""
@@ -1711,21 +1735,19 @@ def record_sold_items(order_id, conn):
     Prevents duplicate inserts
     """
     cursor = conn.cursor(dictionary=True)
-
+    
     cursor.execute("""
         SELECT od.product_purchased AS good_number,
                od.item_quantities AS quantity
         FROM order_detials od
         WHERE od.order_refrence_number = %s
-          AND NOT EXISTS (
-              SELECT 1 FROM product_sold ps
-              WHERE ps.good_number = od.product_purchased
-              AND ps.sold_at IS NOT NULL
-          )
     """, (order_id,))
 
     items = cursor.fetchall()
     now = datetime.now()
+    inserted_count = 0
+
+
 
     for item in items:
         cursor.execute("""
@@ -1738,6 +1760,50 @@ def record_sold_items(order_id, conn):
         ))
 
     return len(items)
+
+def update_product_quantity_current(conn):
+    """
+    Updates product_quantity_current table based on initial_quantity and total sold.
+    """
+    cursor = conn.cursor(dictionary=True)
+    now = datetime.now()
+
+    # Get all products that have been sold
+    cursor.execute("""
+        SELECT ps.good_number, SUM(ps.quantity_sold) AS total_sold
+        FROM product_sold ps
+        GROUP BY ps.good_number
+    """)
+    sold_products = cursor.fetchall()
+
+    for product in sold_products:
+        good_number = product['good_number']
+        total_sold = product['total_sold'] or 0
+
+        # Get initial quantity
+        cursor.execute("""
+            SELECT initial_quantity
+            FROM product_stock_initial
+            WHERE good_number = %s
+        """, (good_number,))
+        initial_row = cursor.fetchone()
+        if not initial_row:
+            continue  # skip if no initial stock
+
+        initial_quantity = initial_row['initial_quantity']
+        current_quantity = initial_quantity - total_sold
+
+        # Insert or update current quantity
+        cursor.execute("""
+            INSERT INTO product_quantity_current (good_number, current_quantity, updated_at)
+            VALUES (%s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                current_quantity = VALUES(current_quantity),
+                updated_at = VALUES(updated_at)
+        """, (good_number, current_quantity, now))
+
+    conn.commit()
+    cursor.close()
 
 @app.route('/record_completed_orders_sold', methods=['POST'])
 def record_completed_orders_sold():
@@ -1901,8 +1967,6 @@ def save_table_reservation():
     finally:
         cursor.close()
         conn.close()
-
-from datetime import date
 
 @app.route('/update_reservation_status', methods=['POST'])
 def update_reservation_status():
@@ -2140,8 +2204,6 @@ LEFT JOIN (
         print("ERROR:", e)
         return jsonify({"error": str(e)}), 500
 
-from flask import jsonify
-
 @app.route('/get_product_categories', methods=['GET'])
 def get_product_categories():
     try:
@@ -2171,38 +2233,8 @@ def logout():
     return redirect(url_for('login_page'))
 
 if __name__ == "__main__":
- app.run(debug=True)
+ app.run(debug=False)
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
