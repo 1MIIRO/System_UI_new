@@ -59,7 +59,7 @@ def get_connection():
     return mysql.connector.connect(
         host='localhost',
         user='root',
-        password='',
+        password='1234',
         database='bakery_busness'
     )
 
@@ -119,7 +119,6 @@ loginForm.addEventListener('submit', async (e) => {
 </body>
 </html>
 """
-
 
 @app.route('/')
 def login_page():
@@ -221,8 +220,6 @@ def get_reservation_statuses():
     cursor.close()
     conn.close()
     return jsonify(reservationstatuses )
-
-
 
 from decimal import Decimal
 
@@ -524,70 +521,6 @@ def filter_orders_route():
         "total_results": len(filtered_orders),
         "output_file": OUTPUT_FILE
     }), 200
-
-@app.route('/dashboard')
-def dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login_page'))
-
-    # Get user info from session
-    user_info = {
-        "user_name": session.get('user_name'),
-        "personal_name": session.get('personal_name'),
-        "job_desc": session.get('job_desc')
-    }
-    
-        # Fetch order categories (Order Type dropdown)
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT order_categories_ID, order_categories_name
-        FROM order_categories
-        ORDER BY order_categories_name
-    """)
-    order_categories = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-
-   # Fetch products with their categories
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT 
-            p.good_number,
-            p.good_name,
-            c.product_category_name AS good_category
-        FROM products p
-        LEFT JOIN products_category_table pct
-            ON p.good_number = pct.product_number
-        LEFT JOIN product_categories c
-            ON pct.product_category_number = c.product_category_number
-        ORDER BY p.good_number
-    """)
-    product_categories = cursor.fetchall()  # This will be a list of dicts with good_number, good_name, good_category
-    cursor.close()
-    conn.close()
-    
-    product_category_map = {p['good_number']: p['good_category'] for p in product_categories}
-
-    # Fetch products
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM products")
-    products = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT Table_db_id,  Table_number FROM tables ORDER BY  Table_number")
-    tables = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    
-    order_description = session.get("order_description", "")
-    return render_template('dashboard.html', user=user_info, products=products,tables=tables,order_categories=order_categories, product_categories=product_categories,product_category_map=product_category_map,order_description=order_description)
 
 @app.route('/description', methods=['GET', 'POST'])
 def description_page():
@@ -1011,6 +944,118 @@ def activity_Order_history():
         order_history_numbers=first_column
         
     )
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+
+    # Get user info from session
+    user_info = {
+        "user_name": session.get('user_name'),
+        "personal_name": session.get('personal_name'),
+        "job_desc": session.get('job_desc')
+    }
+    
+        # Fetch order categories (Order Type dropdown)
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT order_categories_ID, order_categories_name
+        FROM order_categories
+        ORDER BY order_categories_name
+    """)
+    order_categories = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+
+   # Fetch products with their categories
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            p.good_number,
+            p.good_name,
+            c.product_category_name AS good_category
+        FROM products p
+        LEFT JOIN products_category_table pct
+            ON p.good_number = pct.product_number
+        LEFT JOIN product_categories c
+            ON pct.product_category_number = c.product_category_number
+        ORDER BY p.good_number
+    """)
+    product_categories = cursor.fetchall()  # This will be a list of dicts with good_number, good_name, good_category
+    cursor.close()
+    conn.close()
+    
+    product_category_map = {p['good_number']: p['good_category'] for p in product_categories}
+
+    # Fetch products
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM products")
+    products = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT Table_db_id,  Table_number FROM tables ORDER BY  Table_number")
+    tables = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    order_description = session.get("order_description", "")
+    return render_template('dashboard.html', user=user_info, products=products,tables=tables,order_categories=order_categories, product_categories=product_categories,product_category_map=product_category_map,order_description=order_description)
+
+
+@app.route('/Product_Inventory')
+def product_inventory():
+    # Check if user is logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+
+    # Get user info from session
+    user_info = {
+        "user_name": session.get('user_name'),
+        "personal_name": session.get('personal_name'),
+        "job_desc": session.get('job_desc')
+    }
+
+    # Fetch products from the database
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+          SELECT 
+            MAX(p.image_path) AS image_path,
+            MAX(p.good_name) AS good_name,
+            MAX(p.price) AS price,
+            COALESCE(MAX(c.product_category_name), 'Uncategorized') AS product_category,
+            COALESCE(MAX(psi.initial_quantity), 0) AS initial_inventory,
+            COALESCE(SUM(ps.quantity_sold), 0) AS number_of_units_sold,
+            COALESCE(MAX(pqc.current_quantity), MAX(psi.initial_quantity)) AS current_quantity
+        FROM products p
+        LEFT JOIN products_category_table pct
+            ON p.good_number = pct.product_number
+        LEFT JOIN product_categories c
+            ON pct.product_category_number = c.product_category_number
+        LEFT JOIN product_stock_initial psi
+            ON p.good_number = psi.good_number
+        LEFT JOIN product_sold ps
+            ON p.good_number = ps.good_number
+        LEFT JOIN product_quantity_current pqc
+            ON p.good_number = pqc.good_number
+        GROUP BY p.good_number
+        ORDER BY p.good_number
+
+    """)
+    products = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    # Render the template
+    return render_template('Product_Inventory.html', user=user_info, products=products)
 
 # --- FIRST COLUMN: Order Numbers ---
 @app.route('/get_order_numbers')
@@ -2196,5 +2241,4 @@ def logout():
 if __name__ == "__main__":
  app.run(debug=False)
  
-
 
