@@ -2,157 +2,215 @@
  Table_display_Inventory
  For every products.good_number in products table 
 
-+---------------------+--------------------+-----------------+------------------------------------------+-------------------------------------+
-| Products Image      | Product Name       | Product Price   | Product Category                         | Product initial Inventory           |
-+---------------------+--------------------+-----------------+------------------------------------------+-------------------------------------+
-| products.image_path | products.good_name | products.price  | product_categories.product_category_name | products_quantity.products_Quantity |
-+---------------------+--------------------+-----------------+------------------------------------------+-------------------------------------+
++---------------------+--------------------+-----------------+------------------------------------------+-----------------------------------------+------------------------------+---------------------------------------------+
+| Products Image      | Product Name       | Product Price   | Product Category                         | Product initial Inventory               | Number of times units sold   |   product current qty                       |
++---------------------+--------------------+-----------------+------------------------------------------+-----------------------------------------+------------------------------+---------------------------------------------+
+| products.image_path | products.good_name | products.price  | product_categories.product_category_name |product_stock_initial;.products_Quantity |                              | product_quantity_current. current_quantity  |               
++---------------------+--------------------+-----------------+------------------------------------------+-----------------------------------------+------------------------------+---------------------------------------------+
 
-Products Image = get products.image_path on same row as products.good_number
-
-Product Name =  get products.good_name on same row as products.good_number
-
-Product Price = get products.good_name on same row as products.good_number
-
-Product Category = were products_category_table.good_number = products.good_number get products_category_table.product_category_number 
-                   return  product_categories.product_category_name were product_categories.product_category_number = products_category_table.product_category_number
-
-Product initial Inventory = were Products_quantity.good_number  = products.good_number get products_quantity.products_Quantity  
-
-
-
-
+product_quantity_current. current_quantity
++-------------+------------------+---------------------+
+| good_number | current_quantity | updated_at          |
++-------------+------------------+---------------------+
+|           1 |               77 | 2026-02-12 10:00:29 |
+|           2 |               82 | 2026-02-12 10:00:29 |
+|           4 |               61 | 2026-02-12 10:00:29 |
+|           5 |               76 | 2026-02-12 10:00:29 |
+|           9 |               60 | 2026-02-12 10:00:29 |
+|          10 |               80 | 2026-02-12 10:00:29 |
++-------------+------------------+---------------------+
+6 rows in set (0.00 sec)
 
 
+ for all good_number int the products table  insert all product_quantity_current. current_quantity
+
+if number doesnt have = product_stock_initial;.products_Quantity
 
 
 
 
-Products
-+-------------+---------------+------+-----+---------+----------------+
-| Field       | Type          | Null | Key | Default | Extra          |
-+-------------+---------------+------+-----+---------+----------------+
-| good_number | int           | NO   | PRI | NULL    | auto_increment |
-| good_name   | varchar(255)  | NO   |     | NULL    |                |
-| price       | decimal(10,2) | NO   |     | NULL    |                |
-| image_path  | varchar(500)  | YES  |     | NULL    |                |
-| description | text          | YES  |     | NULL    |                |
-+-------------+---------------+------+-----+---------+----------------+
-5 rows in set (0.04 sec)
 
 
-product_categories
-+-------------------------+--------------+------+-----+---------+----------------+
-| Field                   | Type         | Null | Key | Default | Extra          |
-+-------------------------+--------------+------+-----+---------+----------------+
-| product_category_number | int          | NO   | PRI | NULL    | auto_increment |
-| product_category_name   | varchar(255) | NO   |     | NULL    |                |
-+-------------------------+--------------+------+-----+---------+----------------+
-2 rows in set (0.00 sec)
 
++--------------------------------------------------------------+-----------------------------------+-------+------------------+-------------------+----------------------+------------------+
+| image_path                                                   | good_name                         | price | product_category | initial_inventory | number_of_units_sold | current_quantity |
++--------------------------------------------------------------+-----------------------------------+-------+------------------+-------------------+----------------------+------------------+
+| static/food_menu_images/banana_cake_image.jpg                | banana_cake                       |  6.00 | Cake             |                85 |                    8 |               77 |
+| static/food_menu_images/blackforest_cake_image.jpg           | blackforest_cake                  |  6.00 | Cake             |                88 |                    6 |               82 |
+| static/food_menu_images/cake_bread_pic.jpg                   | cake_bread                        |  3.00 | Bread            |                81 |                    0 |               81 |
+| static/food_menu_images/cheese_cake_image.jpg                | cheese_cake                       |  5.00 | Cake             |                90 |                   29 |               61 |
+| static/food_menu_images/chiffon_cake_image.jpg               | chiffon_cake                      |  6.00 | Cake             |                84 |                    8 |               76 |
+| static/food_menu_images/butter_cake_inmage.jpg               | butter_cake                       |  4.00 | Cake             |                87 |                    0 |               87 |
+| static/food_menu_images/chocolate_moos_image.jpg             | choclate_mouse                    |  6.00 | Cake             |                82 |                    0 |               82 |
+| static/food_menu_images/chocolate_cake_image.jpg             | choclate_cake                     |  6.00 | Cake             |                89 |                    0 |               89 |
+| static/food_menu_images/cream_cupcake_image.jpg              | cream_cupcake                     |  4.00 | Donuts           |                86 |                   26 |               60 |
+| static/food_menu_images/french_bread_pic.jpg                 | french_bread                      |  3.00 | Bread            |                83 |                    3 |               80 |
+| static/food_menu_images/italian_bread_pic.jpg                | italian_bread                     |  4.00 | Bread            |                80 |                    0 |               80 |
+| static/food_menu_images/lemon_cake_image.jpg                 | lemon_cake                        |  6.00 | Cake             |                88 |                    0 |               88 |
+| static/food_menu_images/poundcake_image.jpg                  | poundcake                         |  5.00 | Cake             |                85 |                    0 |               85 |
+| static/food_menu_images/sliced_bread_pic.jpg                 | sliced_bread                      |  3.00 | Bread            |                90 |                    0 |               90 |
+| static/food_menu_images/soughdough_bread_pic.jpg             | soughdough_bread                  |  4.00 | Bread            |                82 |                    0 |               82 |
+| static/food_menu_images/sponge_cake_image.jpg                | sponge_cake                       |  5.00 | Cake             |                87 |                    0 |               87 |
+| static/food_menu_images/strawberry_mouse_image.jpg           | strawberry_mouse                  |  5.00 | Cake             |                84 |                    0 |               84 |
+| static/food_menu_images/tiramisu_cake_image.jpg              | tiramisu_cake                     |  6.00 | Cake             |                89 |                    0 |               89 |
+| static/food_menu_images/yeast_donut_image.jpg                | yeast_donut                       |  6.00 | Donuts           |                81 |                    0 |               81 |
+| static/food_menu_images/jelly_doughnut_image.jpg             | jelly_doughnut                    |  6.00 | Donuts           |                86 |                    0 |               86 |
+| static/food_menu_images/glazed_donut_image.jpg               | glazed_doughnut                   |  5.00 | Donuts           |                83 |                    0 |               83 |
+| static/food_menu_images/cruller_donut_image.jpg              | Cruller_Doughnut                  |  6.00 | Donuts           |                88 |                    0 |               88 |
+| static/food_menu_images/cinnamon_bun.jpg                     | Cinnamon Bun                      |  6.50 | Donuts           |                85 |                    0 |               85 |
+| static/food_menu_images/fruit_cake_image.jpg                 | Fruit Cake                        |  8.00 | Donuts           |                90 |                    0 |               90 |
+| static/food_menu_images/waffles.jpg                          | Waffles                           |  7.50 | Donuts           |                82 |                    0 |               82 |
+| static/food_menu_images/Scorn.jpg                            | Scone                             |  6.00 | Pastries         |                87 |                    0 |               87 |
+| static/food_menu_images/gormet_burger.jpg                    | Gourmet Burger                    | 12.00 | Sandwich         |                84 |                    0 |               84 |
+| static/food_menu_images/grilled_cheese_chicken_sandwitch.jpg | Grilled Chicken & Cheese Sandwich | 10.50 | Sandwich         |                89 |                    0 |               89 |
+| static/food_menu_images/salad_sandwitch.jpg                  | Salad Sandwich                    |  8.00 | Sandwich         |                81 |                    0 |               81 |
+| static/food_menu_images/pita_bread_sandwitch.jpg             | Pita Bread Sandwich               |  9.00 | Sandwich         |                86 |                    0 |               86 |
+| static/food_menu_images/grilled_cheese_sandwitch (2).jpg     | Grilled Cheese Sandwich           |  7.50 | Sandwich         |                83 |                    0 |               83 |
+| static/food_menu_images/chef_choice_burger.jpg               | Chef’s Choice Burger              | 13.50 | Sandwich         |                88 |                    0 |               88 |
+| static/food_menu_images/double_decker_cheese_sandwitch.jpg   | Double Decker Cheese Sandwich     | 11.00 | Sandwich         |                85 |                    0 |               85 |
++--------------------------------------------------------------+-----------------------------------+-------+------------------+-------------------+----------------------+------------------+
+33 rows in set (0.01 sec)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
++--------------------------------------------------------------+-----------------------------------+-------+------------------+-------------------+----------------------+
+| image_path                                                   | good_name                         | price | product_category | initial_inventory | number_of_units_sold |
++--------------------------------------------------------------+-----------------------------------+-------+------------------+-------------------+----------------------+
+| static/food_menu_images/banana_cake_image.jpg                | banana_cake                       |  6.00 | Cake             |                85 |                    8 |
+| static/food_menu_images/blackforest_cake_image.jpg           | blackforest_cake                  |  6.00 | Cake             |                88 |                    6 |
+| static/food_menu_images/cake_bread_pic.jpg                   | cake_bread                        |  3.00 | Bread            |                81 |                    0 |
+| static/food_menu_images/cheese_cake_image.jpg                | cheese_cake                       |  5.00 | Cake             |                90 |                   29 |
+| static/food_menu_images/chiffon_cake_image.jpg               | chiffon_cake                      |  6.00 | Cake             |                84 |                    8 |
+| static/food_menu_images/butter_cake_inmage.jpg               | butter_cake                       |  4.00 | Cake             |                87 |                    0 |
+| static/food_menu_images/chocolate_moos_image.jpg             | choclate_mouse                    |  6.00 | Cake             |                82 |                    0 |
+| static/food_menu_images/chocolate_cake_image.jpg             | choclate_cake                     |  6.00 | Cake             |                89 |                    0 |
+| static/food_menu_images/cream_cupcake_image.jpg              | cream_cupcake                     |  4.00 | Donuts           |                86 |                   26 |
+| static/food_menu_images/french_bread_pic.jpg                 | french_bread                      |  3.00 | Bread            |                83 |                    3 |
+| static/food_menu_images/italian_bread_pic.jpg                | italian_bread                     |  4.00 | Bread            |                80 |                    0 |
+| static/food_menu_images/lemon_cake_image.jpg                 | lemon_cake                        |  6.00 | Cake             |                88 |                    0 |
+| static/food_menu_images/poundcake_image.jpg                  | poundcake                         |  5.00 | Cake             |                85 |                    0 |
+| static/food_menu_images/sliced_bread_pic.jpg                 | sliced_bread                      |  3.00 | Bread            |                90 |                    0 |
+| static/food_menu_images/soughdough_bread_pic.jpg             | soughdough_bread                  |  4.00 | Bread            |                82 |                    0 |
+| static/food_menu_images/sponge_cake_image.jpg                | sponge_cake                       |  5.00 | Cake             |                87 |                    0 |
+| static/food_menu_images/strawberry_mouse_image.jpg           | strawberry_mouse                  |  5.00 | Cake             |                84 |                    0 |
+| static/food_menu_images/tiramisu_cake_image.jpg              | tiramisu_cake                     |  6.00 | Cake             |                89 |                    0 |
+| static/food_menu_images/yeast_donut_image.jpg                | yeast_donut                       |  6.00 | Donuts           |                81 |                    0 |
+| static/food_menu_images/jelly_doughnut_image.jpg             | jelly_doughnut                    |  6.00 | Donuts           |                86 |                    0 |
+| static/food_menu_images/glazed_donut_image.jpg               | glazed_doughnut                   |  5.00 | Donuts           |                83 |                    0 |
+| static/food_menu_images/cruller_donut_image.jpg              | Cruller_Doughnut                  |  6.00 | Donuts           |                88 |                    0 |
+| static/food_menu_images/cinnamon_bun.jpg                     | Cinnamon Bun                      |  6.50 | Donuts           |                85 |                    0 |
+| static/food_menu_images/fruit_cake_image.jpg                 | Fruit Cake                        |  8.00 | Donuts           |                90 |                    0 |
+| static/food_menu_images/waffles.jpg                          | Waffles                           |  7.50 | Donuts           |                82 |                    0 |
+| static/food_menu_images/Scorn.jpg                            | Scone                             |  6.00 | Pastries         |                87 |                    0 |
+| static/food_menu_images/gormet_burger.jpg                    | Gourmet Burger                    | 12.00 | Sandwich         |                84 |                    0 |
+| static/food_menu_images/grilled_cheese_chicken_sandwitch.jpg | Grilled Chicken & Cheese Sandwich | 10.50 | Sandwich         |                89 |                    0 |
+| static/food_menu_images/salad_sandwitch.jpg                  | Salad Sandwich                    |  8.00 | Sandwich         |                81 |                    0 |
+| static/food_menu_images/pita_bread_sandwitch.jpg             | Pita Bread Sandwich               |  9.00 | Sandwich         |                86 |                    0 |
+| static/food_menu_images/grilled_cheese_sandwitch (2).jpg     | Grilled Cheese Sandwich           |  7.50 | Sandwich         |                83 |                    0 |
+| static/food_menu_images/chef_choice_burger.jpg               | Chef’s Choice Burger              | 13.50 | Sandwich         |                88 |                    0 |
+| static/food_menu_images/double_decker_cheese_sandwitch.jpg   | Double Decker Cheese Sandwich     | 11.00 | Sandwich         |                85 |                    0 |
++--------------------------------------------------------------+-----------------------------------+-------+------------------+-------------------+----------------------+
+33 rows in set (0.03 sec)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+product_categories;
++-------------------------+-----------------------+
+| product_category_number | product_category_name |
++-------------------------+-----------------------+
+|                       1 | Bread                 |
+|                       2 | Cake                  |
+|                       3 | Donuts                |
+|                       4 | Pastries              |
+|                       5 | Sandwich              |
++-------------------------+-----------------------+
 
 products_category_table;
-+-------------------------+------+------+-----+---------+-------+
-| Field                   | Type | Null | Key | Default | Extra |
-+-------------------------+------+------+-----+---------+-------+
-| product_number          | int  | NO   | MUL | NULL    |       |
-| product_category_number | int  | NO   | MUL | NULL    |       |
-+-------------------------+------+------+-----+---------+-------+
-2 rows in set (0.01 sec)
-
-mysql> DESCRIBE  product_stock_initial;
-+--------------------------+-----------+------+-----+-------------------+-------------------+
-| Field                    | Type      | Null | Key | Default           | Extra             |
-+--------------------------+-----------+------+-----+-------------------+-------------------+
-| product_stock_initial_id | int       | NO   | PRI | NULL              | auto_increment    |
-| good_number              | int       | NO   | MUL | NULL              |                   |
-| initial_quantity         | int       | NO   |     | NULL              |                   |
-| created_at               | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+--------------------------+-----------+------+-----+-------------------+-------------------+
-4 rows in set (0.01 sec)
-
-mysql> DESCRIBE  product_sold;
-+---------------+-----------+------+-----+-------------------+-------------------+
-| Field         | Type      | Null | Key | Default           | Extra             |
-+---------------+-----------+------+-----+-------------------+-------------------+
-| sold_id       | int       | NO   | PRI | NULL              | auto_increment    |
-| good_number   | int       | NO   | MUL | NULL              |                   |
-| quantity_sold | int       | NO   |     | NULL              |                   |
-| sold_at       | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+---------------+-----------+------+-----+-------------------+-------------------+
-4 rows in set (0.00 sec)
-
-mysql> DESCRIBE  product_quantity_current;
-+------------------+-----------+------+-----+-------------------+-----------------------------------------------+
-| Field            | Type      | Null | Key | Default           | Extra                                         |
-+------------------+-----------+------+-----+-------------------+-----------------------------------------------+
-| good_number      | int       | NO   | PRI | NULL              |                                               |
-| current_quantity | int       | NO   |     | NULL              |                                               |
-| updated_at       | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
-+------------------+-----------+------+-----+-------------------+-----------------------------------------------+
-3 rows in set (0.00 sec)
++----------------+-------------------------+
+| product_number | product_category_number |
++----------------+-------------------------+
+|              1 |                       2 |
+|              2 |                       2 |
+|              3 |                       1 |
+|              4 |                       2 |
+|              5 |                       2 |
+|              6 |                       2 |
+|              7 |                       2 |
+|              8 |                       2 |
+|              9 |                       3 |
+|             10 |                       1 |
+|             11 |                       1 |
+|             12 |                       2 |
+|             13 |                       2 |
+|             14 |                       1 |
+|             15 |                       1 |
+|             16 |                       2 |
+|             17 |                       2 |
+|             18 |                       2 |
+|             19 |                       3 |
+|             20 |                       3 |
+|             21 |                       3 |
+|             22 |                       3 |
+|             23 |                       3 |
+|             24 |                       3 |
+|             25 |                       3 |
+|             26 |                       4 |
+|             27 |                       5 |
+|             28 |                       5 |
+|             29 |                       5 |
+|             30 |                       5 |
+|             31 |                       5 |
+|             32 |                       5 |
+|             33 |                       5 |
++----------------+-------------------------+
+33 rows in set (0.00 sec)
+
+ column_4{ Product Category }  
+ for each good_number in the products table 
+
+
 
-mysql> DESCRIBE  product_qty_status;
-+-------------+-------------+------+-----+---------+-------+
-| Field       | Type        | Null | Key | Default | Extra |
-+-------------+-------------+------+-----+---------+-------+
-| status_name | varchar(30) | NO   | PRI | NULL    |       |
-+-------------+-------------+------+-----+---------+-------+
-1 row in set (0.00 sec)
 
-mysql> DESCRIBE  product_qty_status_history;
-+-------------+-------------+------+-----+-------------------+-------------------+
-| Field       | Type        | Null | Key | Default           | Extra             |
-+-------------+-------------+------+-----+-------------------+-------------------+
-| good_number | int         | NO   | MUL | NULL              |                   |
-| status_name | varchar(30) | NO   | MUL | NULL              |                   |
-| recorded_at | timestamp   | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+-------------+-------------+------+-----+-------------------+-------------------+
- 
- 
- 
- 
 
 
 
 
-+-----------------------------+
-| audit_desc                  |
-| audit_logs                  |
-| customer_order              |
-| customer_table_reservations |
-| description_audit           |
-| order_categories            |
-| order_detials               |
-| order_payment_status        |
-| order_status                |
-| order_with_categories       |
-| order_with_state            |
-| order_with_state_payment    |
-| orders_improved_table       |
-| product_categories          |
-| product_category_quantites  |
-| products                    |
-| products_category_table     |
-| reservation_status          |
-| table_floor                 |
-| table_reservation_link      |
-| table_reservation_status    |
-| table_reservations          |
-| tables                      |
-| user                        |
-| user_reservations           |
-+-----------------------------+
-25 rows in set (0.05 sec)
 
 
-PRODUCTS STOKE-INTAKE
 
-For all products in the table products
 
-+----------------------+---------------------+--------------------+-------------------------------------------+------------------------------------------+
-| products.image_path  | products.good_name  | products. price    | product_categories.product_category_name  | product_stock_initial.initial_quantity   |
-+----------------------+---------------------+--------------------+-------------------------------------------+------------------------------------------+
 
 
 
@@ -160,19 +218,8 @@ For all products in the table products
 
 
 
-DESCRIBE  product_sold;
-+---------------+-----------+------+-----+-------------------+-------------------+
-| Field         | Type      | Null | Key | Default           | Extra             |
-+---------------+-----------+------+-----+-------------------+-------------------+
-| sold_id       | int       | NO   | PRI | NULL              | auto_increment    |
-| good_number   | int       | NO   | MUL | NULL              |                   |
-| quantity_sold | int       | NO   |     | NULL              |                   |
-| sold_at       | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
-+---------------+-----------+------+-----+-------------------+-------------------+
-4 rows in set (0.00 sec)
 
 
-get good_name 
 
 
 
@@ -182,8 +229,75 @@ get good_name
 
 
 
+SELECT*FROM product_sold;
++---------+-------------+---------------+---------------------+
+| sold_id | good_number | quantity_sold | sold_at             |
++---------+-------------+---------------+---------------------+
+|       1 |           4 |            29 | 2026-02-10 15:56:20 |
+|       2 |           9 |            26 | 2026-02-11 09:52:17 |
+|       3 |          10 |             1 | 2026-02-11 09:59:53 |
+|       4 |           5 |             1 | 2026-02-11 10:28:37 |
+|       5 |          10 |             1 | 2026-02-11 10:30:14 |
+|       6 |          10 |             1 | 2026-02-11 11:23:01 |
+|       7 |           2 |             6 | 2026-02-12 09:59:49 |
+|       8 |           5 |             7 | 2026-02-12 10:00:02 |
+|       9 |           1 |             8 | 2026-02-12 10:00:29 |
++---------+-------------+---------------+---------------------+
+9 rows in set (0.00 sec)
 
+mysql>
+mysql> SELECT* FROM product_stock_initial;
++--------------------------+-------------+------------------+---------------------+
+| product_stock_initial_id | good_number | initial_quantity | created_at          |
++--------------------------+-------------+------------------+---------------------+
+|                        1 |           1 |               85 | 2026-02-10 14:56:40 |
+|                        2 |           2 |               88 | 2026-02-10 14:56:40 |
+|                        3 |           3 |               81 | 2026-02-10 14:56:40 |
+|                        4 |           4 |               90 | 2026-02-10 14:56:40 |
+|                        5 |           5 |               84 | 2026-02-10 14:56:40 |
+|                        6 |           6 |               87 | 2026-02-10 14:56:40 |
+|                        7 |           7 |               82 | 2026-02-10 14:56:40 |
+|                        8 |           8 |               89 | 2026-02-10 14:56:40 |
+|                        9 |           9 |               86 | 2026-02-10 14:56:40 |
+|                       10 |          10 |               83 | 2026-02-10 14:56:40 |
+|                       11 |          11 |               80 | 2026-02-10 14:56:40 |
+|                       12 |          12 |               88 | 2026-02-10 14:56:40 |
+|                       13 |          13 |               85 | 2026-02-10 14:56:40 |
+|                       14 |          14 |               90 | 2026-02-10 14:56:40 |
+|                       15 |          15 |               82 | 2026-02-10 14:56:40 |
+|                       16 |          16 |               87 | 2026-02-10 14:56:40 |
+|                       17 |          17 |               84 | 2026-02-10 14:56:40 |
+|                       18 |          18 |               89 | 2026-02-10 14:56:40 |
+|                       19 |          19 |               81 | 2026-02-10 14:56:40 |
+|                       20 |          20 |               86 | 2026-02-10 14:56:40 |
+|                       21 |          21 |               83 | 2026-02-10 14:56:40 |
+|                       22 |          22 |               88 | 2026-02-10 14:56:40 |
+|                       23 |          23 |               85 | 2026-02-10 14:56:40 |
+|                       24 |          24 |               90 | 2026-02-10 14:56:40 |
+|                       25 |          25 |               82 | 2026-02-10 14:56:40 |
+|                       26 |          26 |               87 | 2026-02-10 14:56:40 |
+|                       27 |          27 |               84 | 2026-02-10 14:56:40 |
+|                       28 |          28 |               89 | 2026-02-10 14:56:40 |
+|                       29 |          29 |               81 | 2026-02-10 14:56:40 |
+|                       30 |          30 |               86 | 2026-02-10 14:56:40 |
+|                       31 |          31 |               83 | 2026-02-10 14:56:40 |
+|                       32 |          32 |               88 | 2026-02-10 14:56:40 |
+|                       33 |          33 |               85 | 2026-02-10 14:56:40 |
++--------------------------+-------------+------------------+---------------------+
+33 rows in set (0.00 sec)
 
+mysql> select * from product_quantity_current;
++-------------+------------------+---------------------+
+| good_number | current_quantity | updated_at          |
++-------------+------------------+---------------------+
+|           1 |               77 | 2026-02-12 10:00:29 |
+|           2 |               82 | 2026-02-12 10:00:29 |
+|           4 |               61 | 2026-02-12 10:00:29 |
+|           5 |               76 | 2026-02-12 10:00:29 |
+|           9 |               60 | 2026-02-12 10:00:29 |
+|          10 |               80 | 2026-02-12 10:00:29 |
++-------------+------------------+---------------------+
+6 rows in set (0.00 sec)
 
 
 
@@ -301,6 +415,26 @@ get good_name
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+return render_template('Product_Inventory.html', user=user_info, products=products)
 
 
 
