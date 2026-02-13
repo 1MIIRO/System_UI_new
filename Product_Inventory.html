@@ -128,8 +128,8 @@
      <!-- BUTTON CONTAINER AS HORIZONTAL NAV -->
     <div id="buttonsContainer" class="buttons-container">
        <button class="dashboard-btn1">Stock Take</button>
-	   <button class="dashboard-btn">Link 2</button> 
-	   <button class="dashboard-btn">Link 3</button>
+	   <button class="dashboard-btn2">Add Product Inventory</button> 
+	   <button class="dashboard-btn3">status checker</button>
 	   <button class="dashboard-btn">Link 4</button>
 	   <button class="dashboard-btn">Link 5</button>
     </div>
@@ -248,10 +248,58 @@
             shiftUI(false, false);
         });
 
-                
-     document.querySelector('.dashboard-btn1').addEventListener('click', () => {
+        function loadProductCategories() {
+            fetch('/get_product_categories')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch categories");
+                    }
+                    return response.json();
+                })
+                .then(categories => {
+
+                    const select = document.getElementById('productCategorySelect');
+
+                    if (!select) {
+                        console.error("Dropdown not found in DOM");
+                        return;
+                    }
+
+                    select.innerHTML = ''; // Clear loading option
+
+                    categories.forEach(category => {
+                        const option = document.createElement('option');
+
+                        option.value = category.product_category_number; // stores number
+                        option.textContent = category.product_category_name; // shows name
+
+                        select.appendChild(option);
+                    });
+
+                })
+                .catch(error => {
+                    console.error("Error loading categories:", error);
+                });
+        }
+
+
+        // Track button click state
+        let stockTakeClickCount = 0;
+
+        document.querySelector('.dashboard-btn1').addEventListener('click', () => {
             const bigDisplay = document.getElementById('bigDisplay');
-            bigDisplay.innerHTML = ''; // clear previous content
+            stockTakeClickCount++;
+
+            // Triple-click: remove table
+            if (stockTakeClickCount === 3) {
+                bigDisplay.innerHTML = '';
+                bigDisplay.style.display = 'none';
+                stockTakeClickCount = 0; // reset counter
+                return;
+            }
+
+            // First or second click: show or rebuild table
+            bigDisplay.innerHTML = ''; // clear previous table
             bigDisplay.style.display = 'block';
 
             const table = document.createElement('table');
@@ -275,7 +323,6 @@
 
             // ==== Safe JSON conversion ====
             const productsData = JSON.parse('{{ products|tojson|safe }}');
-
             const tbody = document.getElementById('inventoryBody');
 
             productsData.forEach(p => {
@@ -302,12 +349,12 @@
                 tdPrice.textContent = p.price;
                 tr.appendChild(tdPrice);
 
-                // Column 4: Category (from backend)
+                // Column 4: Category
                 const tdCategory = document.createElement('td');
                 tdCategory.textContent = p.product_category || 'Uncategorized';
                 tr.appendChild(tdCategory);
 
-               // Column 5: Product initial Inventory
+                // Column 5: Product initial Inventory
                 const tdInventory = document.createElement('td');
                 tdInventory.textContent = p.initial_inventory;
                 tr.appendChild(tdInventory);
@@ -317,25 +364,92 @@
                 tdUnitsSold.textContent = p.number_of_units_sold !== undefined ? p.number_of_units_sold : 0;
                 tr.appendChild(tdUnitsSold);
 
-                // Column 7: Current quantity (last column)
+                // Column 7: Current quantity
                 const tdCurrentQty = document.createElement('td');
                 tdCurrentQty.textContent = p.current_quantity !== undefined ? p.current_quantity : p.initial_inventory;
                 tr.appendChild(tdCurrentQty);
-                        
 
                 tbody.appendChild(tr);
             });
-
         });
+            
+        // Track button click state for Add Product Inventory
+        let addInventoryClickCount = 0;
 
+        document.querySelector('.dashboard-btn2').addEventListener('click', () => {
+            const bigDisplay = document.getElementById('bigDisplay');
+            addInventoryClickCount++;
 
+            // Triple-click: remove table
+            if (addInventoryClickCount === 3) {
+                bigDisplay.innerHTML = '';
+                bigDisplay.style.display = 'none';
+                addInventoryClickCount = 0; // reset counter
+                return;
+            }
 
+            // First or second click: show or rebuild table
+            bigDisplay.innerHTML = ''; // clear previous table
+            bigDisplay.style.display = 'block';
 
+            const table = document.createElement('table');
+            table.classList.add('table', 'table-bordered');
+            table.style.width = '100%';
 
+            // Correct class names (dot notation, no spaces)
+            table.innerHTML = `
+                <thead class="Table.header">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Product Price</th>
+                        <th>Product Image</th>
+                        <th>Product Description</th>
+                        <th>Product Category</th>
+                        <th>Product Quantity</th>
+                        <th>SAVE</th>
+                    </tr>
+                </thead>
+                <tbody class="Table.body" id="addInventoryBody">
+                    <tr>
+                        <td><input type="text" placeholder="Product Name" class="form-control"></td>
+                        <td><input type="number" placeholder="Price" class="form-control"></td>
+                        <td><input type="text" placeholder="Image Path" class="form-control"></td>
+                        <td><input type="text" placeholder="Description" class="form-control"></td>
+                       <td>
+                            <select class="form-select" id="productCategorySelect">
+                                    <option value="">Loading categories...</option>
+                            </select>
+                        </td>
+                        <td><input type="number" placeholder="Initial Quantity" class="form-control"></td>
+                        <td><button class="save_btn btn btn-primary">SAVE</button></td>
+                    </tr>
+                </tbody>
+            `;
 
+            bigDisplay.appendChild(table);
+            loadProductCategories();
 
-
-
+           // ----- SECOND SMALL TABLE BELOW -----
+                const smallTable = document.createElement('table');
+                smallTable.classList.add('table', 'table-bordered');
+                smallTable.style.width = '100%';
+                smallTable.innerHTML = `
+                    <thead style="background-color: #007bff; color: white;">
+                        <tr>
+                            <th>Product Category</th>
+                            <th>Save</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" class="form-control" placeholder="Enter category"></td>
+                            <td><button class="btn btn-primary save_btn">SAVE</button></td>
+                        </tr>
+                    </tbody>
+                `;
+                bigDisplay.appendChild(smallTable);
+                
+        });
 
 
     </script>

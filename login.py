@@ -1009,7 +1009,6 @@ def dashboard():
     order_description = session.get("order_description", "")
     return render_template('dashboard.html', user=user_info, products=products,tables=tables,order_categories=order_categories, product_categories=product_categories,product_category_map=product_category_map,order_description=order_description)
 
-
 @app.route('/Product_Inventory')
 def product_inventory():
     # Check if user is logged in
@@ -2241,4 +2240,3 @@ def logout():
 if __name__ == "__main__":
  app.run(debug=False)
  
-
